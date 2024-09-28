@@ -1,5 +1,6 @@
 package com.example.cctvui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -114,8 +115,11 @@ public class filter_activity extends AppCompatActivity {
             if (banksCheckbox.isChecked()) ownership.append("Banks ");
         }
 
-        // Display the selected filters in a Toast (or use the filters as needed)
-        String message = "Distance: " + distance + " km, Backup: " + backup + " days, Ownership: " + ownership.toString().trim();
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        // Pass the filter data back to the previous activity (mapsui)
+        Intent intent = new Intent();
+        intent.putExtra("distance", distance);  // Send the distance filter
+        intent.putExtra("ownership", ownership.toString().trim());  // Send ownership filter
+        setResult(RESULT_OK, intent); // Pass the data back to mapsui activity
+        finish(); // Close the filter activity
     }
 }

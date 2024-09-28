@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Adjust these values based on the size of your search bar and bottom navigation menu -->
+    <dimen name="map_top_padding">80dp</dimen> <!-- Adjust the padding to fit your search bar -->
+    <dimen name="map_bottom_padding">100dp</dimen> <!-- Adjust the padding to fit your bottom menu -->
+</resources>

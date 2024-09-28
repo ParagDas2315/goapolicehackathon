@@ -1,4 +1,4 @@
-<FrameLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,19 +8,19 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <!-- Search Bar Section (Overlaid on top of the map) -->
     <LinearLayout
         android:id="@+id/search_bar_layout"
         android:layout_width="320dp"
-    android:layout_height="55dp"
-    android:layout_gravity="top|center_horizontal"
-    android:layout_marginTop="16dp"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:padding="8dp"
-    android:background="@drawable/rounded_search_bar">
+        android:layout_height="55dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:background="@drawable/rounded_search_bar">
 
     <!-- Search Icon -->
     <ImageView
@@ -30,9 +30,9 @@
         android:paddingStart="10dp"
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_search"
-        android:contentDescription="Search Icon"/>
+        android:contentDescription="Search Icon" />
 
-    <!-- Search Bar EditText -->
+    <!-- Search Bar EditText (Non-editable, acts as a trigger for Autocomplete) -->
     <EditText
         android:id="@+id/searchBar"
         android:layout_width="0dp"
@@ -45,7 +45,9 @@
         android:paddingLeft="0dp"
         android:gravity="center_vertical"
         android:textSize="16sp"
-        android:inputType="text"/>
+        android:focusable="false"
+        android:cursorVisible="false"
+        android:inputType="none" />
 
     <!-- Filter Icon -->
     <ImageView
@@ -55,128 +57,143 @@
         android:paddingStart="10dp"
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_filter"
-        android:contentDescription="Filter Icon"/>
+        android:contentDescription="Filter Icon"
+        android:clickable="true"
+        android:focusable="true" /> <!-- Ensuring it's clickable -->
 </LinearLayout>
+
+    <!-- Show Cameras Button (Overlaid on top of the map, above the bottom menu) -->
+<Button
+android:id="@+id/show_cameras_button"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Show Cameras"
+android:layout_gravity="bottom|center_horizontal"
+android:layout_marginBottom="100dp"
+android:textColor="#FFFFFF"
+android:textSize="16sp"
+android:background="@drawable/rounded_button" />
 
     <!-- Bottom Menu Section (Overlaid on top of the map) -->
 <LinearLayout
 android:id="@+id/menu_section"
 android:layout_width="320dp"
+android:layout_height="wrap_content"
+android:layout_gravity="bottom|center_horizontal"
+android:layout_marginBottom="25dp"
+android:orientation="horizontal"
+android:gravity="center"
+android:padding="8dp"
+android:background="@drawable/rounded_menu_background">
+
+<!-- Settings Button -->
+<LinearLayout
+    android:id="@+id/settings_button"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:layout_gravity="bottom|center_horizontal"
-    android:layout_marginBottom="25dp"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:gravity="center"
-    android:padding="8dp"
-    android:background="@drawable/rounded_menu_background">
-
-    <!-- Settings Button -->
-<LinearLayout
-android:id="@+id/settings_button"
-android:layout_width="0dp"
-android:layout_height="wrap_content"
-android:orientation="vertical"
-android:gravity="center"
-android:padding="4dp"
+    android:padding="4dp"
     android:layout_weight="1">
 
-<ImageView
-android:id="@+id/settings_icon"
-android:layout_width="25dp"
-android:layout_height="25dp"
-android:src="@drawable/ic_settings"
-android:contentDescription="Settings Icon"/>
+    <ImageView
+        android:id="@+id/settings_icon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/ic_settings"
+        android:contentDescription="Settings Icon" />
 
-<TextView
-android:id="@+id/settings_label"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="Settings"
-android:textColor="#2C3E50"
-android:textSize="9sp"
-android:textStyle="bold"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/settings_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textColor="#2C3E50"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+</LinearLayout>
 
-    <!-- Help Button -->
+<!-- Help Button -->
 <LinearLayout
-android:id="@+id/help_button"
-android:layout_width="0dp"
-android:layout_height="wrap_content"
-android:orientation="vertical"
-android:gravity="center"
-android:padding="4dp"
+    android:id="@+id/help_button"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="4dp"
     android:layout_weight="1">
 
-<ImageView
-android:id="@+id/help_icon"
-android:layout_width="25dp"
-android:layout_height="25dp"
-android:src="@drawable/ic_help"
-android:contentDescription="Help Icon"/>
+    <ImageView
+        android:id="@+id/help_icon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/ic_help"
+        android:contentDescription="Help Icon" />
 
-<TextView
-android:id="@+id/help_label"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="Help"
-android:textColor="#2C3E50"
-android:textSize="9sp"
-android:textStyle="bold"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/help_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Help"
+        android:textColor="#2C3E50"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+</LinearLayout>
 
-    <!-- Upload Button -->
+<!-- Upload Button -->
 <LinearLayout
-android:id="@+id/upload_button"
-android:layout_width="0dp"
-android:layout_height="wrap_content"
-android:orientation="vertical"
-android:gravity="center"
-android:padding="4dp"
+    android:id="@+id/upload_button"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="4dp"
     android:layout_weight="1">
 
-<ImageView
-android:id="@+id/upload_icon"
-android:layout_width="25dp"
-android:layout_height="25dp"
-android:src="@drawable/ic_upload"
-android:contentDescription="Upload Icon"/>
+    <ImageView
+        android:id="@+id/upload_icon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/ic_upload"
+        android:contentDescription="Upload Icon" />
 
-<TextView
-android:id="@+id/upload_label"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="Upload"
-android:textColor="#2C3E50"
-android:textSize="9sp"
-android:textStyle="bold"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/upload_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload"
+        android:textColor="#2C3E50"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+</LinearLayout>
 
-    <!-- Account Button -->
+<!-- Account Button -->
 <LinearLayout
-android:id="@+id/account_button"
-android:layout_width="0dp"
-android:layout_height="wrap_content"
-android:orientation="vertical"
-android:gravity="center"
-android:padding="4dp"
+    android:id="@+id/account_button"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="4dp"
     android:layout_weight="1">
 
-<ImageView
-android:id="@+id/account_image"
-android:layout_width="25dp"
-android:layout_height="25dp"
-android:src="@drawable/circle_placeholder"
-android:contentDescription="User Account"/>
+    <ImageView
+        android:id="@+id/account_image"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/circle_placeholder"
+        android:contentDescription="User Account" />
 
-<TextView
-android:id="@+id/account_label"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="Account"
-android:textColor="#2C3E50"
-android:textSize="9sp"
-android:textStyle="bold"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/account_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Account"
+        android:textColor="#2C3E50"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+</LinearLayout>
 
-    </LinearLayout>
-    </FrameLayout>
+</LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

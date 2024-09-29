@@ -378,6 +378,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                     if (radiusInKm > 0) {
                         // Call the function to filter cameras by radius, ownership, and backup days
                         filterCameras(radiusInKm);
+
                     } else {
                         Toast.makeText(this, "Invalid radius", Toast.LENGTH_SHORT).show();
                     }

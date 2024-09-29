@@ -8,6 +8,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class HelpActivity extends AppCompatActivity {
 
@@ -29,7 +30,7 @@ public class HelpActivity extends AppCompatActivity {
         fetchFirestoreData();
     }
 
-    // Method to fetch Firestore data as a string and process it
+    // Method to fetch Firestore data and display all fields
     private void fetchFirestoreData() {
         // Get the Firestore instance
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -44,16 +45,13 @@ public class HelpActivity extends AppCompatActivity {
                         List<DocumentSnapshot> documentList = new ArrayList<>(task.getResult().getDocuments());
 
                         for (DocumentSnapshot document : documentList) {
-                            // Retrieve specific fields: Ownership and Backupdays
-                            String ownership = document.getString("Ownership");
-                            Long backupDays = document.getLong("Backupdays");
+                            // Get all fields in the document
+                            Map<String, Object> documentData = document.getData();
 
-                            // Append the data to the string builder if it exists
-                            if (ownership != null) {
-                                completeData.append("Ownership: ").append(ownership).append("\n");
-                            }
-                            if (backupDays != null) {
-                                completeData.append("Backup Days: ").append(backupDays).append("\n");
+                            if (documentData != null) {
+                                for (Map.Entry<String, Object> entry : documentData.entrySet()) {
+                                    completeData.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+                                }
                             }
 
                             // Add a separator for each document
@@ -61,9 +59,9 @@ public class HelpActivity extends AppCompatActivity {
                         }
 
                         // Log the full string data for debugging
-                        Log.d(TAG, "Complete Ownership and Backupdays Data: " + completeData.toString());
+                        Log.d(TAG, "Complete Data: " + completeData.toString());
 
-                        // Set the text view with the Ownership and Backup Days data
+                        // Set the text view with all the data
                         helpContentTextView.setText(completeData.toString());
                     } else {
                         helpContentTextView.setText("Failed to fetch data");

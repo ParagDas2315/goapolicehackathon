@@ -3,28 +3,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp"
+    android:gravity="top"
+    android:background="#F5F5F5">
 
     <!-- User Data Management Heading -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="User Data Management"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_gravity="center"/>
+        android:textColor="#333333"
+        android:layout_gravity="center"
+        android:layout_marginBottom="32dp" />
 
     <!-- Insert Button -->
     <Button
         android:id="@+id/insert_user_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Insert User Data" />
+        android:text="Insert User Data"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:elevation="6dp"
+        android:layout_marginBottom="24dp" />
 
     <!-- Delete Button -->
     <Button
         android:id="@+id/delete_user_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Delete User Data" />
+        android:text="Delete User Data"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:elevation="6dp" />
 </LinearLayout>

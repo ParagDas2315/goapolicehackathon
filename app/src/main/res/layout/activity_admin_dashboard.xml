@@ -7,6 +7,16 @@
     android:gravity="center"
     android:background="#FFFFFF">
 
+    <!-- CCTV Camera Icon on Top -->
+    <ImageView
+        android:id="@+id/cctv_icon"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_cctv_camera"
+        android:contentDescription="CCTV Camera Icon"
+        android:layout_gravity="center"
+        android:layout_marginBottom="32dp" />
+
     <!-- Manage CCTV Data Button -->
     <Button
         android:id="@+id/manage_cctv_button"
@@ -15,7 +25,7 @@
         android:text="Manage CCTV Data"
         android:padding="16dp"
         android:textSize="18sp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:background="@drawable/rounded_button"
         android:textColor="#FFFFFF" />
 
@@ -29,5 +39,15 @@
         android:textSize="18sp"
         android:background="@drawable/rounded_button"
         android:textColor="#FFFFFF" />
+
+    <!-- Humanoid Icon on Bottom -->
+    <ImageView
+        android:id="@+id/humanoid_icon"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_humanoid"
+        android:contentDescription="Humanoid Icon"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp" />
 
 </LinearLayout>

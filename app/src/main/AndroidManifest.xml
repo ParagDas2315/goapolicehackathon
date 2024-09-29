@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -24,20 +23,26 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCUmGgLNBjljdjjDauRNIXjgxPTagg0BKs"/> <!-- Replace with your actual API key -->
 
-        <!-- Login Activity (Main Launcher Activity) -->
+        <!-- Splash Activity (New Launcher Activity) -->
         <activity
-            android:name=".LoginActivity"
-            android:exported="true"> <!-- Explicitly exported for Android 12+ -->
+            android:name=".SplashActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Login Activity (Main Login Page) -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true" /> <!-- No longer the launcher, opens after splash -->
+
         <!-- Admin Dashboard Activity -->
         <activity
             android:name=".AdminDashboardActivity"
-            android:exported="false" /> <!-- Not exported since it's only accessed post login -->
+            android:exported="false" /> <!-- Not exported since it's only accessed post-login -->
 
         <!-- Main mapsui Activity -->
         <activity
@@ -78,11 +83,12 @@
         <activity
             android:name=".ManageUserDataActivity"
             android:exported="false" /> <!-- User data management, not exported -->
+
+        <!-- Insert/Delete Activities -->
         <activity android:name=".InsertCCTVActivity" android:exported="false" />
         <activity android:name=".DeleteCCTVActivity" android:exported="false" />
         <activity android:name=".InsertUserActivity" android:exported="false" />
         <activity android:name=".DeleteUserActivity" android:exported="false" />
 
     </application>
-
 </manifest>

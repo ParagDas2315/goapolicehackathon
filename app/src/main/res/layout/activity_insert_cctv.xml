@@ -1,94 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F5F5F5">
 
-    <LinearLayout
+    <!-- Title (Fixed) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Insert CCTV Data"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Input fields for inserting data -->
+            <EditText
+                android:id="@+id/input_sno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Sno"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_latitude"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Latitude"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_longitude"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Longitude"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_backupdays"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Backup Days"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_connected_to_network"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Connected to Network"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_contact_no"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Contact No"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_coverage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Coverage"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Location"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_owner_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Owner Name"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_ownership"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ownership"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/input_work_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Work Status"
+                android:padding="12dp"
+                android:background="@drawable/rounded_edit_text"
+                android:layout_marginBottom="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Insert button (Fixed) -->
+    <Button
+        android:id="@+id/insert_cctv_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="Insert CCTV Data"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:elevation="6dp"
+        android:layout_marginTop="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Insert CCTV Data"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <!-- Input fields for inserting data -->
-        <EditText
-            android:id="@+id/input_sno"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Sno" />
-
-        <EditText
-            android:id="@+id/input_latitude"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Latitude" />
-
-        <EditText
-            android:id="@+id/input_longitude"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Longitude" />
-
-        <EditText
-            android:id="@+id/input_backupdays"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Backup Days" />
-
-        <EditText
-            android:id="@+id/input_connected_to_network"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Connected to Network" />
-
-        <EditText
-            android:id="@+id/input_contact_no"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Contact No" />
-
-        <EditText
-            android:id="@+id/input_coverage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Coverage" />
-
-        <EditText
-            android:id="@+id/input_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Location" />
-
-        <EditText
-            android:id="@+id/input_owner_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Owner Name" />
-
-        <EditText
-            android:id="@+id/input_ownership"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Ownership" />
-
-        <EditText
-            android:id="@+id/input_work_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Work Status" />
-
-        <!-- Insert button -->
-        <Button
-            android:id="@+id/insert_cctv_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Insert CCTV Data" />
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

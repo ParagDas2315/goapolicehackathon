@@ -3,15 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:gravity="center_horizontal"
+    android:padding="24dp"
+    android:background="#F5F5F5">
 
     <!-- CCTV Data Management Heading -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="CCTV Data Management"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="32dp"
         android:layout_gravity="center"/>
 
     <!-- Insert Button -->
@@ -19,12 +23,24 @@
         android:id="@+id/insert_cctv_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Insert CCTV Data" />
+        android:text="Insert CCTV Data"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:elevation="6dp"
+        android:layout_marginBottom="16dp"/>
 
     <!-- Delete Button -->
     <Button
         android:id="@+id/delete_cctv_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Delete CCTV Data" />
+        android:text="Delete CCTV Data"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_button"
+        android:padding="16dp"
+        android:elevation="6dp"
+        android:layout_marginBottom="16dp"/>
 </LinearLayout>

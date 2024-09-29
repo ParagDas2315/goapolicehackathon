@@ -31,30 +31,55 @@
             </intent-filter>
         </activity>
 
+        <!-- Admin Dashboard Activity -->
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="false" /> <!-- Not exported since it's only accessed post login -->
+
         <!-- Main mapsui Activity -->
         <activity
             android:name=".mapsui"
             android:exported="false" /> <!-- Not exported since no intent-filter -->
 
         <!-- Filter Activity -->
-        <activity android:name=".filter_activity"
+        <activity
+            android:name=".filter_activity"
             android:exported="false" /> <!-- Not exported since no intent-filter -->
 
         <!-- Settings Activity -->
-        <activity android:name=".SettingsActivity"
+        <activity
+            android:name=".SettingsActivity"
             android:exported="false" />
 
         <!-- Help Activity -->
-        <activity android:name=".HelpActivity"
+        <activity
+            android:name=".HelpActivity"
             android:exported="false" />
 
         <!-- Upload Activity -->
-        <activity android:name=".UploadActivity"
+        <activity
+            android:name=".UploadActivity"
             android:exported="false" />
 
         <!-- Account Activity -->
-        <activity android:name=".AccountActivity"
+        <activity
+            android:name=".AccountActivity"
             android:exported="false" />
 
+        <!-- Manage CCTV Activity -->
+        <activity
+            android:name=".ManageCCTVActivity"
+            android:exported="false" /> <!-- CCTV management, not exported -->
+
+        <!-- Manage User Data Activity -->
+        <activity
+            android:name=".ManageUserDataActivity"
+            android:exported="false" /> <!-- User data management, not exported -->
+        <activity android:name=".InsertCCTVActivity" android:exported="false" />
+        <activity android:name=".DeleteCCTVActivity" android:exported="false" />
+        <activity android:name=".InsertUserActivity" android:exported="false" />
+        <activity android:name=".DeleteUserActivity" android:exported="false" />
+
     </application>
+
 </manifest>

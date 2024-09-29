@@ -1,33 +1,45 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     android:padding="16dp">
 
-    <!-- Back Arrow Button -->
-    <ImageView
-        android:id="@+id/back_arrow"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/ic_back_arrow"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="30dp"
-        android:contentDescription="Back Arrow" />
-
-    <!-- Title -->
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- LinearLayout to align Back Arrow and Title horizontally -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Help Page"
-        android:textSize="24sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="10dp"> <!-- Reduced margin to move the title up -->
 
-    <!-- TextView to display Firestore data -->
+        <!-- Back Arrow Button -->
+        <ImageView
+            android:id="@+id/back_arrow"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_back_arrow"
+            android:contentDescription="Back Arrow"
+            android:onClick="onBackArrowClick"
+            android:layout_marginEnd="16dp"/>
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/terminal_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Terminal"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#2C3E50"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+    <!-- TextView to display terminal content -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/back_arrow"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header_layout"
         android:layout_marginTop="16dp">
 
         <TextView
@@ -35,6 +47,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="#000000" />
+            android:textColor="#2C3E50"/>
     </ScrollView>
 </RelativeLayout>

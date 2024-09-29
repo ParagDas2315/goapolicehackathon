@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="10dp"> <!-- Reduced margin to move the title up -->
 
         <!-- Back Arrow Button -->
         <ImageView
@@ -30,8 +30,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Filter Options"
-            android:textSize="24sp"
-            android:textColor="#2C3E50" />
+            android:textSize="26sp"
+        android:textColor="#2C3E50"
+        android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Distance Filter -->
@@ -42,7 +43,7 @@
         android:layout_below="@id/header_layout"
         android:orientation="vertical"
         android:padding="16dp"
-        android:layout_marginTop="16dp"> <!-- Add margin to separate the title and filters -->
+        android:layout_marginTop="20dp"> <!-- Adjusted margin for a cleaner look -->
 
         <TextView
             android:layout_width="wrap_content"

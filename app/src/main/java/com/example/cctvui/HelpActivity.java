@@ -44,33 +44,26 @@ public class HelpActivity extends AppCompatActivity {
                         List<DocumentSnapshot> documentList = new ArrayList<>(task.getResult().getDocuments());
 
                         for (DocumentSnapshot document : documentList) {
-                            // Convert the entire document data into a string
-                            String documentData = document.getData().toString();
+                            // Retrieve specific fields: Ownership and Backupdays
+                            String ownership = document.getString("Ownership");
+                            Long backupDays = document.getLong("Backupdays");
 
-                            // Split the string by commas
-                            String[] dataArray = documentData.split(",");
-
-                            // Process each element in the array
-                            for (String dataPiece : dataArray) {
-                                // Trim any extra spaces
-                                dataPiece = dataPiece.trim();
-
-                                // Check for Latitude, Longitude, Owner, and Duration
-                                if (dataPiece.contains("Latitude") || dataPiece.contains("Longitude")) {
-                                    Log.d(TAG, "Latitude/Longitude Data: " + dataPiece);
-                                    completeData.append(dataPiece).append("\n");
-                                } else if (dataPiece.contains("Ownership")) {
-                                    completeData.append(dataPiece).append("\n");
-                                } else if (dataPiece.contains("Backupdays")) {
-                                    completeData.append(dataPiece).append("\n");
-                                }
+                            // Append the data to the string builder if it exists
+                            if (ownership != null) {
+                                completeData.append("Ownership: ").append(ownership).append("\n");
+                            }
+                            if (backupDays != null) {
+                                completeData.append("Backup Days: ").append(backupDays).append("\n");
                             }
 
-                            // Log the full string data for debugging
-                            Log.d(TAG, "Full Document Data: " + documentData);
+                            // Add a separator for each document
+                            completeData.append("\n-----------------------\n");
                         }
 
-                        // Set the text view with the Latitude, Longitude, Owner, and Duration data
+                        // Log the full string data for debugging
+                        Log.d(TAG, "Complete Ownership and Backupdays Data: " + completeData.toString());
+
+                        // Set the text view with the Ownership and Backup Days data
                         helpContentTextView.setText(completeData.toString());
                     } else {
                         helpContentTextView.setText("Failed to fetch data");

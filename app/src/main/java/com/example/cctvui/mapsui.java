@@ -46,7 +46,10 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import android.os.Environment;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import android.os.Looper;
 
 public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
@@ -67,6 +70,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
     private Button showCamerasButton;
     private boolean areCamerasVisible = false;  // To toggle visibility state
     private List<Marker> cameraMarkers = new ArrayList<>();  // Store camera markers
+    private int currentMapType = GoogleMap.MAP_TYPE_NORMAL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +156,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         }
 
         mMap = googleMap;
+        mMap.setMapType(currentMapType);
 
         // Check location permissions and set up the map's location features
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -297,7 +302,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
     private void setupBottomMenuClickListeners() {
         settingsButton.setOnClickListener(v -> {
             highlightSelected(settingsButton);
-            openSettingsPage();
+            toggleMapTerrain();
         });
         helpButton.setOnClickListener(v -> {
             highlightSelected(helpButton);
@@ -305,7 +310,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         });
         uploadButton.setOnClickListener(v -> {
             highlightSelected(uploadButton);
-            openUploadPage();
+            saveDataToKml();
         });
         accountButton.setOnClickListener(v -> {
             highlightSelected(accountButton);
@@ -468,8 +473,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
 
 
     private void openSettingsPage() {
-        Intent intent = new Intent(mapsui.this, SettingsActivity.class);
-        startActivity(intent);
+
     }
 
     private void openHelpPage() {
@@ -477,10 +481,6 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         startActivity(intent);
     }
 
-    private void openUploadPage() {
-        Intent intent = new Intent(mapsui.this, UploadActivity.class);
-        startActivity(intent);
-    }
 
     private void openAccountPage() {
         Intent intent = new Intent(mapsui.this, AccountActivity.class);
@@ -521,6 +521,97 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         float[] results = new float[1];
         Location.distanceBetween(lat1, lon1, lat2, lon2, results);
         return results[0] / 1000;  // Convert to kilometers
+    }
+
+    private void saveDataToKml() {
+        // Ensure that the cameraMarkers list is not empty
+        if (cameraMarkers.isEmpty()) {
+            Toast.makeText(this, "No camera markers to save.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // KML Header
+        StringBuilder kmlData = new StringBuilder();
+        kmlData.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        kmlData.append("<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n");
+        kmlData.append("<Document>\n");
+        kmlData.append("<name>CCTV Locations</name>\n");
+
+        // Iterate over the markers and add their coordinates to the KML data
+        for (Marker marker : cameraMarkers) {
+            LatLng position = marker.getPosition();
+            kmlData.append("<Placemark>\n");
+            kmlData.append("<name>CCTV Location</name>\n");
+            kmlData.append("<Point>\n");
+            kmlData.append("<coordinates>").append(position.longitude).append(",").append(position.latitude).append("</coordinates>\n");
+            kmlData.append("</Point>\n");
+            kmlData.append("</Placemark>\n");
+        }
+
+        // KML Footer
+        kmlData.append("</Document>\n");
+        kmlData.append("</kml>\n");
+
+        // Save the KML file to the Documents directory
+        saveKmlFile(kmlData.toString());
+    }
+
+    private void saveKmlFile(String kmlContent) {
+        // Check if external storage is writable
+        if (!isExternalStorageWritable()) {
+            Toast.makeText(this, "External storage is not writable.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create a file in the Documents directory
+        File documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        if (!documentsDir.exists()) {
+            documentsDir.mkdirs();
+        }
+
+        // Define the KML file
+        File kmlFile = new File(documentsDir, "cctv_locations.kml");
+
+        // Write the KML data to the file
+        try (FileOutputStream fos = new FileOutputStream(kmlFile)) {
+            fos.write(kmlContent.getBytes());
+            Toast.makeText(this, "KML file saved: " + kmlFile.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(this, "Error saving KML file.", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error writing KML file", e);
+        }
+    }
+
+    // Helper method to check if external storage is writable
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
+    }
+
+    private void toggleMapTerrain() {
+        switch (currentMapType) {
+            case GoogleMap.MAP_TYPE_NORMAL:
+                currentMapType = GoogleMap.MAP_TYPE_TERRAIN;
+                Toast.makeText(this, "Terrain View Enabled", Toast.LENGTH_SHORT).show();
+                break;
+            case GoogleMap.MAP_TYPE_TERRAIN:
+                currentMapType = GoogleMap.MAP_TYPE_SATELLITE;
+                Toast.makeText(this, "Satellite View Enabled", Toast.LENGTH_SHORT).show();
+                break;
+            case GoogleMap.MAP_TYPE_SATELLITE:
+                currentMapType = GoogleMap.MAP_TYPE_HYBRID;
+                Toast.makeText(this, "Hybrid View Enabled", Toast.LENGTH_SHORT).show();
+                break;
+            case GoogleMap.MAP_TYPE_HYBRID:
+                currentMapType = GoogleMap.MAP_TYPE_NORMAL;
+                Toast.makeText(this, "Normal View Enabled", Toast.LENGTH_SHORT).show();
+                break;
+        }
+
+        // Apply the new map type
+        if (mMap != null) {
+            mMap.setMapType(currentMapType);
+        }
     }
 
     // Filter and show cameras within the given radius

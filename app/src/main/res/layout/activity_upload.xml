@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="9dp">
 
         <!-- Back Arrow Button -->
         <ImageView
@@ -26,19 +26,19 @@
 
         <!-- Title -->
         <TextView
-            android:id="@+id/upload_title"
+            android:id="@+id/update_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upload"
+            android:text="Save"
             android:textSize="24sp"
             android:textColor="#2C3E50"/>
     </LinearLayout>
 
-    <!-- Placeholder for upload content -->
+    <!-- Placeholder for update content -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Upload page content will go here"
+        android:text="Update page content will go here"
         android:textSize="16sp"
         android:textColor="#2C3E50"
         android:layout_centerInParent="true"/>

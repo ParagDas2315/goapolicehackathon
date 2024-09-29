@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="9dp"> <!-- Adjust top margin -->
 
         <!-- Back Arrow Button -->
         <ImageView
@@ -20,8 +20,7 @@
             android:layout_height="30dp"
             android:src="@drawable/ic_back_arrow"
             android:contentDescription="Back Arrow"
-            android:onClick="onBackArrowClick"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="8dp"/> <!-- Adjust margin between back arrow and title -->
 
         <!-- Title -->
         <TextView
@@ -30,7 +29,9 @@
             android:layout_height="wrap_content"
             android:text="Settings"
             android:textSize="24sp"
-            android:textColor="#2C3E50"/>
+            android:textColor="#2C3E50"
+            android:layout_marginStart="8dp"/> <!-- Adjust margin to make the title align properly -->
+
     </LinearLayout>
 
     <!-- Placeholder for settings content -->
@@ -41,4 +42,5 @@
         android:textSize="16sp"
         android:textColor="#2C3E50"
         android:layout_centerInParent="true"/>
+
 </RelativeLayout>

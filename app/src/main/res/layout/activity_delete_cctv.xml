@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete CCTV Data"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Input field for Sno to delete -->
+        <EditText
+            android:id="@+id/input_sno_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Sno to Delete"
+            android:minHeight="48dp"
+            android:padding="12dp" />
+
+        <!-- Delete button -->
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete Entry"
+            android:minHeight="48dp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>

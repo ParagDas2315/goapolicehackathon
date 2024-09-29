@@ -8,6 +8,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,8 +42,15 @@ public class InsertUserActivity extends AppCompatActivity {
                 return;
             }
 
-            // Call the function to insert data into Firestore
-            insertUserData(username, password);
+            // Hash the password before storing it
+            String encryptedPassword = hashPassword(password);
+
+            if (encryptedPassword != null) {
+                // Call the function to insert data into Firestore
+                insertUserData(username, encryptedPassword);
+            } else {
+                Toast.makeText(InsertUserActivity.this, "Error encrypting password", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -50,7 +59,7 @@ public class InsertUserActivity extends AppCompatActivity {
         // Create a new user data object
         Map<String, Object> userData = new HashMap<>();
         userData.put("username", username);
-        userData.put("password", password);
+        userData.put("password", password); // Insert encrypted password
 
         // Insert data into Firestore
         db.collection("users").add(userData).addOnSuccessListener(documentReference -> {
@@ -66,5 +75,30 @@ public class InsertUserActivity extends AppCompatActivity {
     private void clearInputFields() {
         usernameInput.setText("");
         passwordInput.setText("");
+    }
+
+    // Function to hash the password using SHA-256
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(password.getBytes());
+            return bytesToHex(encodedHash);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Helper function to convert byte array to a hexadecimal string
+    private String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 }

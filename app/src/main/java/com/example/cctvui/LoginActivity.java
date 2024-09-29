@@ -3,7 +3,6 @@ package com.example.cctvui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -11,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -33,13 +35,11 @@ public class LoginActivity extends AppCompatActivity {
         adminLoginButton = findViewById(R.id.admin_login_button);
 
         // Set click listener for regular login button
-        loginButton.setOnClickListener(v -> loginUser(false));
+        loginButton.setOnClickListener(v -> loginUser());
 
-        // Set click listener for admin login button
-        adminLoginButton.setOnClickListener(v -> loginUser(true));
     }
 
-    private void loginUser(boolean isAdmin) {
+    private void loginUser() {
         String username = usernameInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
@@ -53,8 +53,16 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        // Hash the input password before checking with Firestore
+        String encryptedPassword = hashPassword(password);
+
+        if (encryptedPassword == null) {
+            Toast.makeText(LoginActivity.this, "Error encrypting password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Query Firestore to check if the user exists and the password matches
-        CollectionReference usersRef = isAdmin ? db.collection("admin") : db.collection("users");
+        CollectionReference usersRef = db.collection("users");
         usersRef.whereEqualTo("username", username)
                 .get()
                 .addOnCompleteListener(task -> {
@@ -63,21 +71,15 @@ public class LoginActivity extends AppCompatActivity {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String storedPassword = document.getString("password");
 
-                            // Compare input password with stored password
-                            if (password.equals(storedPassword)) {
+                            // Compare input encrypted password with stored password
+                            if (encryptedPassword.equals(storedPassword)) {
                                 userFound = true;
 
                                 // Display login success message
                                 Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                                // If login is successful, navigate to the appropriate activity
-                                Intent intent;
-                                if (isAdmin) {
-                                    intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
-                                } else {
-                                    intent = new Intent(LoginActivity.this, mapsui.class);
-                                }
-
+                                // If login is successful, navigate to mapsui activity
+                                Intent intent = new Intent(LoginActivity.this, mapsui.class);
                                 startActivity(intent);
                                 finish();
                                 break;
@@ -92,5 +94,30 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    // Function to hash the password using SHA-256
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(password.getBytes());
+            return bytesToHex(encodedHash);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Helper function to convert byte array to a hexadecimal string
+    private String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 }

@@ -35,11 +35,13 @@ public class LoginActivity extends AppCompatActivity {
         adminLoginButton = findViewById(R.id.admin_login_button);
 
         // Set click listener for regular login button
-        loginButton.setOnClickListener(v -> loginUser());
+        loginButton.setOnClickListener(v -> loginUser(false));
 
+        // Set click listener for admin login button
+        adminLoginButton.setOnClickListener(v -> loginUser(true));
     }
 
-    private void loginUser() {
+    private void loginUser(boolean isAdmin) {
         String username = usernameInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
@@ -53,40 +55,49 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Hash the input password before checking with Firestore
-        String encryptedPassword = hashPassword(password);
-
-        if (encryptedPassword == null) {
-            Toast.makeText(LoginActivity.this, "Error encrypting password", Toast.LENGTH_SHORT).show();
-            return;
+        // If the login is not for admin, hash the password before comparison
+        if (!isAdmin) {
+            password = hashPassword(password);
+            if (password == null) {
+                Toast.makeText(LoginActivity.this, "Error hashing password", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         // Query Firestore to check if the user exists and the password matches
-        CollectionReference usersRef = db.collection("users");
+        CollectionReference usersRef = isAdmin ? db.collection("admin") : db.collection("users");
+        String finalPassword = password;
         usersRef.whereEqualTo("username", username)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        boolean userFound = false;
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        boolean isValid = false;
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String storedPassword = document.getString("password");
 
-                            // Compare input encrypted password with stored password
-                            if (encryptedPassword.equals(storedPassword)) {
-                                userFound = true;
+                            // Compare the input password (hashed) with the stored hashed password for regular users
+                            // Directly compare the plain text password for admins
+                            if (finalPassword.equals(storedPassword)) {
+                                isValid = true;
 
                                 // Display login success message
                                 Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                                // If login is successful, navigate to mapsui activity
-                                Intent intent = new Intent(LoginActivity.this, mapsui.class);
+                                // If login is successful, navigate to the appropriate activity
+                                Intent intent;
+                                if (isAdmin) {
+                                    intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                                } else {
+                                    intent = new Intent(LoginActivity.this, mapsui.class);
+                                }
+
                                 startActivity(intent);
                                 finish();
                                 break;
                             }
                         }
 
-                        if (!userFound) {
+                        if (!isValid) {
                             Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
                         }
                     } else {
@@ -96,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    // Function to hash the password using SHA-256
+    // Function to hash the password using SHA-256 (used for regular users only)
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

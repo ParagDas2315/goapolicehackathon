@@ -55,11 +55,13 @@ public class HelpActivity extends AppCompatActivity {
                                 // Trim any extra spaces
                                 dataPiece = dataPiece.trim();
 
-                                // Check if the data piece contains Latitude or Longitude
+                                // Check for Latitude, Longitude, Owner, and Duration
                                 if (dataPiece.contains("Latitude") || dataPiece.contains("Longitude")) {
                                     Log.d(TAG, "Latitude/Longitude Data: " + dataPiece);
-
-                                    // Add only Latitude and Longitude to the display
+                                    completeData.append(dataPiece).append("\n");
+                                } else if (dataPiece.contains("Ownership")) {
+                                    completeData.append(dataPiece).append("\n");
+                                } else if (dataPiece.contains("Backupdays")) {
                                     completeData.append(dataPiece).append("\n");
                                 }
                             }
@@ -68,7 +70,7 @@ public class HelpActivity extends AppCompatActivity {
                             Log.d(TAG, "Full Document Data: " + documentData);
                         }
 
-                        // Set the text view with the Latitude/Longitude data
+                        // Set the text view with the Latitude, Longitude, Owner, and Duration data
                         helpContentTextView.setText(completeData.toString());
                     } else {
                         helpContentTextView.setText("Failed to fetch data");

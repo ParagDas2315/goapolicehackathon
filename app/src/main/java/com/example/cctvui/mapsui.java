@@ -10,10 +10,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -38,6 +40,8 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -155,6 +159,14 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setCompassEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+            // Use existing dimension values for padding
+            int topPadding = getResources().getDimensionPixelSize(R.dimen.map_top_padding);  // Padding for My Location button
+            int bottomPadding = getResources().getDimensionPixelSize(R.dimen.map_bottom_padding);  // Padding for Zoom controls
+
+            // Apply padding to Google Maps UI
+            mMap.setPadding(0, topPadding, 0, bottomPadding);  // Left, Top, Right, Bottom padding
+
             startLocationUpdates();
 
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
@@ -164,7 +176,109 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
                 }
             });
+
+            // Set a click listener for the markers
+            mMap.setOnMarkerClickListener(marker -> {
+                LatLng markerPosition = marker.getPosition();
+                fetchCameraDetailsFromFirestore(markerPosition.latitude, markerPosition.longitude);
+                return true;
+            });
         }
+    }
+
+
+
+    private void fetchCameraDetailsFromFirestore(double latitude, double longitude) {
+        // Query Firestore using the latitude and longitude
+        db.collection("cctvdatanew")
+                .whereEqualTo("Latitude", latitude)
+                .whereEqualTo("Longitude", longitude)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);  // Assuming only one match
+                        String owner = document.getString("Owner");
+                        Long backupDays = document.getLong("BackupDays");
+
+                        // Show bottom sheet with fetched data
+                        showBottomSheet(latitude, longitude);
+                    } else {
+                        Toast.makeText(mapsui.this, "No data found for this location.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void showBottomSheet(double latitude, double longitude) {
+        // Query Firestore using the latitude and longitude
+        Query query = db.collection("cctvdatanew")
+                .whereEqualTo("Latitude", latitude);
+        query  // Ensure latitude is a String for comparison
+                .whereEqualTo("Longitude", longitude)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);  // Assuming only one match
+
+                        // Fetch all available data from Firestore
+                        Long sno = document.getLong("Sno");
+                        String location = document.getString("Location");
+                        String ownership = document.getString("Ownership");
+                        String ownerName = document.getString("OwnerName");
+                        Object contactNo = document.get("ContactNo");  // Fetch as Object to handle different types
+                        String workStatus = document.getString("Workstatus");
+                        String coverage = document.getString("Coverage");
+                        Long backupDays = document.getLong("Backupdays");
+                        String connectedToNetwork = document.getString("Connectedtonetwork");
+
+                        // Show bottom sheet with fetched data
+                        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+                        View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet, null);
+
+                        // Find views inside bottom sheet and set data
+                        TextView tvSno = bottomSheetView.findViewById(R.id.tv_sno);
+                        TextView tvLocation = bottomSheetView.findViewById(R.id.tv_location);
+                        TextView tvOwnership = bottomSheetView.findViewById(R.id.tv_ownership);
+                        TextView tvOwnerName = bottomSheetView.findViewById(R.id.tv_owner_name);
+                        TextView tvContactNo = bottomSheetView.findViewById(R.id.tv_contact_no);
+                        TextView tvWorkStatus = bottomSheetView.findViewById(R.id.tv_work_status);
+                        TextView tvCoverage = bottomSheetView.findViewById(R.id.tv_coverage);
+                        TextView tvBackupDays = bottomSheetView.findViewById(R.id.tv_backup_days);
+                        TextView tvConnectedToNetwork = bottomSheetView.findViewById(R.id.tv_connected_to_network);
+
+                        // Set the data in the views
+                        tvSno.setText("S.No: " + sno);
+                        tvLocation.setText("Location: " + location);
+                        tvOwnership.setText("Ownership: " + ownership);
+                        tvOwnerName.setText("Owner Name: " + ownerName);
+
+                        // Handle ContactNo of different types (String, Long, etc.)
+                        if (contactNo != null) {
+                            if (contactNo instanceof Long) {
+                                tvContactNo.setText("Contact No: " + ((Long) contactNo).toString());
+                            } else if (contactNo instanceof String) {
+                                tvContactNo.setText("Contact No: " + (String) contactNo);
+                            } else {
+                                tvContactNo.setText("Contact No: Unknown format");
+                            }
+                        } else {
+                            tvContactNo.setText("Contact No: Not available");
+                        }
+
+                        tvWorkStatus.setText("Work Status: " + workStatus);
+                        tvCoverage.setText("Coverage: " + coverage);
+                        tvBackupDays.setText("Backup Days: " + backupDays);
+                        tvConnectedToNetwork.setText("Connected to Network: " + connectedToNetwork);
+
+                        bottomSheetDialog.setContentView(bottomSheetView);
+                        bottomSheetDialog.show();
+
+                    } else {
+                        Toast.makeText(mapsui.this, "No data found for this location.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(mapsui.this, "Error fetching data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
@@ -230,7 +344,6 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                     mMap.addMarker(new MarkerOptions().position(selectedLocation).title(place.getName()));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15));
                 }
-
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR && data != null) {
                 Status status = Autocomplete.getStatusFromIntent(data);
                 Toast.makeText(this, "An error occurred: " + status.getStatusMessage(), Toast.LENGTH_SHORT).show();
@@ -239,16 +352,27 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
 
         // Handle the result from the filter activity
         if (requestCode == FILTER_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            // Get the distance and ownership filter from the filter activity
+            // Get the distance, ownership, and backupdays filter from the filter activity
             String distanceStr = data.getStringExtra("distance");
             String ownership = data.getStringExtra("ownership");
+            String backupDaysStr = data.getStringExtra("backup");  // Fetch the backup days from the intent
+
+            // Parse backup days as integer
+            int backupDays = 0;
+            if (backupDaysStr != null && !backupDaysStr.isEmpty()) {
+                try {
+                    backupDays = Integer.parseInt(backupDaysStr);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(this, "Invalid backup days value", Toast.LENGTH_SHORT).show();
+                }
+            }
 
             if (distanceStr != null && !distanceStr.isEmpty()) {
                 try {
                     double radiusInKm = Double.parseDouble(distanceStr);
                     if (radiusInKm > 0) {
-                        // Call the function to filter cameras by radius
-                        filterCamerasWithinRadius(radiusInKm);
+                        // Call the function to filter cameras by radius, ownership, and backup days
+                        filterCameras(radiusInKm, ownership, backupDays);
                     } else {
                         Toast.makeText(this, "Invalid radius", Toast.LENGTH_SHORT).show();
                     }
@@ -257,11 +381,12 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                 }
             }
 
-            // Ownership filtering logic (optional, if needed)
-            // You can handle ownership filtering here if needed
-            Log.d(TAG, "Ownership: " + ownership);  // This is just a placeholder for ownership filtering
+            // Log the ownership and backup days (if needed for further processing)
+            Log.d(TAG, "Ownership: " + ownership);
+            Log.d(TAG, "Backup Days: " + backupDays);
         }
     }
+
 
 
     private void openSettingsPage() {
@@ -322,7 +447,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
 
     // Filter and show cameras within the given radius
     // Filter and show cameras within the given radius
-    private void filterCamerasWithinRadius(double radiusInKm) {
+    private void filterCameras(Double radiusInKm, @Nullable String ownership, @Nullable Integer backupDays) {
         // Check permission before accessing location
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             try {
@@ -338,49 +463,82 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                         db.collection("cctvdatanew").get().addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 List<DocumentSnapshot> documentList = new ArrayList<>(task.getResult().getDocuments());
+                                List<MarkerOptions> markersToPlot = new ArrayList<>();
 
                                 for (DocumentSnapshot document : documentList) {
-                                    // Convert the entire document data into a string
-                                    String documentData = document.getData().toString();
-
-                                    // Split the string by commas
-                                    String[] dataArray = documentData.split(",");
-
-                                    // Temporary variables for latitude and longitude
+                                    // Temporary variables for latitude, longitude, ownership, and backupdays
                                     Double latitude = null;
                                     Double longitude = null;
+                                    String ownerData = null;
+                                    Integer documentBackupDays = null;
 
-                                    // Process each element in the array
-                                    for (String dataPiece : dataArray) {
-                                        dataPiece = dataPiece.trim();
+                                    // Process each element in the document
+                                    for (String key : document.getData().keySet()) {
+                                        Object dataPiece = document.get(key);  // Get the field value as an Object
 
-                                        // Check if the data piece contains Latitude or Longitude
-                                        if (dataPiece.contains("Latitude")) {
-                                            latitude = Double.parseDouble(dataPiece.split("=")[1].trim());
-                                        } else if (dataPiece.contains("Longitude")) {
-                                            longitude = Double.parseDouble(dataPiece.split("=")[1].trim());
-                                        }
+                                        // Ensure the value is a string before splitting
+                                        if (dataPiece instanceof String) {
+                                            String[] parts = ((String) dataPiece).split("=");
 
-                                        // If both latitude and longitude are available, add the marker
-                                        if (latitude != null && longitude != null) {
-                                            double distanceToCamera = calculateDistance(userLat, userLng, latitude, longitude);
-
-                                            // Only show markers within the specified radius
-                                            if (distanceToCamera <= radiusInKm) {
-                                                LatLng cameraLocation = new LatLng(latitude, longitude);
-                                                Marker marker = mMap.addMarker(new MarkerOptions()
-                                                        .position(cameraLocation)
-                                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                                                        .title("CCTV Location"));
-
-                                                cameraMarkers.add(marker);  // Add marker to the list
+                                            // Check if the split resulted in two parts before accessing them
+                                            if (parts.length == 2) {
+                                                if (key.equals("Latitude")) {
+                                                    latitude = Double.parseDouble(parts[1].trim());
+                                                } else if (key.equals("Longitude")) {
+                                                    longitude = Double.parseDouble(parts[1].trim());
+                                                } else if (key.equals("Owner")) {
+                                                    ownerData = parts[1].trim();
+                                                } else if (key.equals("BackupDays")) {
+                                                    documentBackupDays = Integer.parseInt(parts[1].trim());
+                                                }
+                                            } else {
+                                                // Log a warning or handle the case where split doesn't have two parts
+                                                Log.w(TAG, "Unexpected format for " + key + ": " + dataPiece);
                                             }
-
-                                            // Reset latitude and longitude for next iteration
-                                            latitude = null;
-                                            longitude = null;
                                         }
                                     }
+
+
+                                    // If latitude and longitude are available, start filtering
+                                    if (latitude != null && longitude != null) {
+                                        boolean passesFilters = true;
+
+                                        // 1. Check the distance filter (if radius is provided)
+                                        if (radiusInKm != null) {
+                                            double distanceToCamera = calculateDistance(userLat, userLng, latitude, longitude);
+                                            if (distanceToCamera > radiusInKm) {
+                                                passesFilters = false;
+                                            }
+                                        }
+
+                                        // 2. Check the ownership filter (if ownership is provided)
+                                        if (ownership != null && !ownership.equals("All")) {
+                                            if (ownerData == null || !ownerData.equals(ownership)) {
+                                                passesFilters = false;
+                                            }
+                                        }
+
+                                        // 3. Check the backup days filter (if backupDays is provided)
+                                        if (backupDays != null) {
+                                            if (documentBackupDays == null || !documentBackupDays.equals(backupDays)) {
+                                                passesFilters = false;
+                                            }
+                                        }
+
+                                        // If the camera passes all active filters, prepare to plot it
+                                        if (passesFilters) {
+                                            LatLng cameraLocation = new LatLng(latitude, longitude);
+                                            markersToPlot.add(new MarkerOptions()
+                                                    .position(cameraLocation)
+                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                                                    .title("CCTV Location"));
+                                        }
+                                    }
+                                }
+
+                                // Plot all the filtered markers
+                                for (MarkerOptions markerOptions : markersToPlot) {
+                                    cameraMarkers.add(mMap.addMarker(markerOptions));
                                 }
 
                                 // Update camera visibility state
@@ -403,6 +561,8 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         }
     }
+
+
 
 
     // Fetch and log camera data (latitude and longitude)
@@ -469,4 +629,3 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                 });
     }
 }
-

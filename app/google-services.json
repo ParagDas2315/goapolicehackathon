@@ -1,98 +1,29 @@
 {
   "project_info": {
-    "project_number": "181507938717",
-    "firebase_url": "https://geotagged-db-default-rtdb.firebaseio.com",
-    "project_id": "geotagged-db",
-    "storage_bucket": "geotagged-db.appspot.com"
+    "project_number": "326073516462",
+    "project_id": "goapolicehackathon-6d7c1",
+    "storage_bucket": "goapolicehackathon-6d7c1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:181507938717:android:a5bc0a529297cd195b3774",
-        "android_client_info": {
-          "package_name": "com.example.cctvappjava"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "181507938717-qg677bcr0h3qt94285rcmatk42jaf18n.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA86KGSPt5CTrakxCdvEl1xV_dolFSNsm0"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "181507938717-qg677bcr0h3qt94285rcmatk42jaf18n.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:181507938717:android:48c00ec2a99a79d45b3774",
+        "mobilesdk_app_id": "1:326073516462:android:684acd9d9230aadca9083f",
         "android_client_info": {
           "package_name": "com.example.cctvui"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "181507938717-qg677bcr0h3qt94285rcmatk42jaf18n.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA86KGSPt5CTrakxCdvEl1xV_dolFSNsm0"
+          "current_key": "AIzaSyABARYcP8s7OrwYQz_UrZSIZUJjtFob3io"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "181507938717-qg677bcr0h3qt94285rcmatk42jaf18n.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:181507938717:android:d6576dc9e190ab555b3774",
-        "android_client_info": {
-          "package_name": "de.kai_morich.simple_usb_terminal"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "181507938717-qg677bcr0h3qt94285rcmatk42jaf18n.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA86KGSPt5CTrakxCdvEl1xV_dolFSNsm0"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "181507938717-qg677bcr0h3qt94285rcmatk42jaf18n.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
   ],
-  "configuration_version": "1"
+  "configuration_version": "1"
 }

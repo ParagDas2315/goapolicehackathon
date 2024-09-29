@@ -35,19 +35,21 @@ dependencies {
     implementation libs.play.services.maps
     implementation libs.play.services.location
 
-    // Add Firebase Bill of Materials (BOM) to manage versions centrally
-    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    // Firebase Bill of Materials (BOM)
+    implementation platform('com.google.firebase:firebase-bom:31.1.0')
 
-    // Use Firebase dependencies without specifying individual versions
-    implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-firestore'
-
-    // Google Play Services
+    // Google Play Services dependencies
     implementation 'com.google.android.gms:play-services-maps:18.0.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.android.libraries.places:places:2.5.0'
 
-    // Testing
+    // Firebase dependencies (BOM manages versions)
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-firestore'
+
+    // Testing dependencies
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

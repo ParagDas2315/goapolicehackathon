@@ -372,7 +372,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                     double radiusInKm = Double.parseDouble(distanceStr);
                     if (radiusInKm > 0) {
                         // Call the function to filter cameras by radius, ownership, and backup days
-                        filterCameras(radiusInKm, ownership, backupDays);
+                        filterCameras(radiusInKm);
                     } else {
                         Toast.makeText(this, "Invalid radius", Toast.LENGTH_SHORT).show();
                     }
@@ -387,6 +387,84 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
+    private void fetchFirestoreData() {
+        db.collection("cctvdatanew")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Clear any existing markers from the map
+                        cameraMarkers.clear();
+                        mMap.clear();
+
+                        // Fetch all documents from the Firestore collection
+                        List<DocumentSnapshot> documentList = new ArrayList<>(task.getResult().getDocuments());
+
+                        // Iterate over each document
+                        for (DocumentSnapshot document : documentList) {
+                            // Convert the entire document data into a string
+                            String documentData = document.getData().toString();
+
+                            // Split the string by commas
+                            String[] dataArray = documentData.split(",");
+
+                            // Temporary variables for latitude and longitude
+                            Double latitude = null;
+                            Double longitude = null;
+
+                            // Process each element in the array
+                            for (String dataPiece : dataArray) {
+                                dataPiece = dataPiece.trim();
+
+                                // Extract Latitude
+                                if (dataPiece.contains("Latitude")) {
+                                    try {
+                                        latitude = Double.parseDouble(dataPiece.split("=")[1].trim());
+                                    } catch (NumberFormatException e) {
+                                        Log.e(TAG, "Error parsing Latitude: " + dataPiece, e);
+                                    }
+                                }
+
+                                // Extract Longitude
+                                if (dataPiece.contains("Longitude")) {
+                                    try {
+                                        longitude = Double.parseDouble(dataPiece.split("=")[1].trim());
+                                    } catch (NumberFormatException e) {
+                                        Log.e(TAG, "Error parsing Longitude: " + dataPiece, e);
+                                    }
+                                }
+
+                                // If both latitude and longitude are available, add the marker
+                                if (latitude != null && longitude != null) {
+                                    LatLng location = new LatLng(latitude, longitude);
+
+                                    // Add yellow marker to the map and store in the list
+                                    Marker marker = mMap.addMarker(new MarkerOptions()
+                                            .position(location)
+                                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                                            .title("CCTV Location"));
+
+                                    cameraMarkers.add(marker); // Add marker to the list
+
+                                    // Reset latitude and longitude for the next iteration
+                                    latitude = null;
+                                    longitude = null;
+                                }
+                            }
+                        }
+
+                        // Set camera markers to visible initially
+                        for (Marker marker : cameraMarkers) {
+                            marker.setVisible(true);
+                        }
+
+                        areCamerasVisible = true;
+                        showCamerasButton.setText("Hide Cameras");
+
+                    } else {
+                        Log.e(TAG, "Error fetching data", task.getException());
+                    }
+                });
+    }
 
 
     private void openSettingsPage() {
@@ -447,7 +525,8 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
 
     // Filter and show cameras within the given radius
     // Filter and show cameras within the given radius
-    private void filterCameras(Double radiusInKm, @Nullable String ownership, @Nullable Integer backupDays) {
+    // Fetch and log camera data (latitude and longitude)
+    private void filterCameras(Double radiusInKm) {
         // Check permission before accessing location
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             try {
@@ -456,94 +535,89 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                         double userLat = location.getLatitude();
                         double userLng = location.getLongitude();
 
+                        // Log user's current location
+                        Log.d(TAG, "User location - Lat: " + userLat + ", Lng: " + userLng);
+
                         // Clear previous markers and list
                         cameraMarkers.clear();
                         mMap.clear();
 
+                        // Fetch all cameras from Firestore
                         db.collection("cctvdatanew").get().addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 List<DocumentSnapshot> documentList = new ArrayList<>(task.getResult().getDocuments());
-                                List<MarkerOptions> markersToPlot = new ArrayList<>();
 
                                 for (DocumentSnapshot document : documentList) {
-                                    // Temporary variables for latitude, longitude, ownership, and backupdays
+                                    // Convert the entire document data into a string
+                                    String documentData = document.getData().toString();
+
+                                    // Split the string by commas
+                                    String[] dataArray = documentData.split(",");
+
+                                    // Temporary variables for latitude and longitude
                                     Double latitude = null;
                                     Double longitude = null;
-                                    String ownerData = null;
-                                    Integer documentBackupDays = null;
 
-                                    // Process each element in the document
-                                    for (String key : document.getData().keySet()) {
-                                        Object dataPiece = document.get(key);  // Get the field value as an Object
+                                    // Process each element in the array
+                                    for (String dataPiece : dataArray) {
+                                        dataPiece = dataPiece.trim();
 
-                                        // Ensure the value is a string before splitting
-                                        if (dataPiece instanceof String) {
-                                            String[] parts = ((String) dataPiece).split("=");
-
-                                            // Check if the split resulted in two parts before accessing them
-                                            if (parts.length == 2) {
-                                                if (key.equals("Latitude")) {
-                                                    latitude = Double.parseDouble(parts[1].trim());
-                                                } else if (key.equals("Longitude")) {
-                                                    longitude = Double.parseDouble(parts[1].trim());
-                                                } else if (key.equals("Owner")) {
-                                                    ownerData = parts[1].trim();
-                                                } else if (key.equals("BackupDays")) {
-                                                    documentBackupDays = Integer.parseInt(parts[1].trim());
-                                                }
-                                            } else {
-                                                // Log a warning or handle the case where split doesn't have two parts
-                                                Log.w(TAG, "Unexpected format for " + key + ": " + dataPiece);
+                                        // Extract Latitude
+                                        if (dataPiece.contains("Latitude")) {
+                                            try {
+                                                latitude = Double.parseDouble(dataPiece.split("=")[1].trim());
+                                            } catch (NumberFormatException e) {
+                                                Log.e(TAG, "Error parsing Latitude: " + dataPiece, e);
                                             }
                                         }
-                                    }
 
+                                        // Extract Longitude
+                                        if (dataPiece.contains("Longitude")) {
+                                            try {
+                                                longitude = Double.parseDouble(dataPiece.split("=")[1].trim());
+                                            } catch (NumberFormatException e) {
+                                                Log.e(TAG, "Error parsing Longitude: " + dataPiece, e);
+                                            }
+                                        }
 
-                                    // If latitude and longitude are available, start filtering
-                                    if (latitude != null && longitude != null) {
-                                        boolean passesFilters = true;
-
-                                        // 1. Check the distance filter (if radius is provided)
-                                        if (radiusInKm != null) {
+                                        // If both latitude and longitude are available, perform filtering
+                                        if (latitude != null && longitude != null) {
+                                            // Calculate distance using the Haversine formula
                                             double distanceToCamera = calculateDistance(userLat, userLng, latitude, longitude);
-                                            if (distanceToCamera > radiusInKm) {
-                                                passesFilters = false;
-                                            }
-                                        }
+                                            Log.d(TAG, "Distance to camera: " + distanceToCamera + " km");
 
-                                        // 2. Check the ownership filter (if ownership is provided)
-                                        if (ownership != null && !ownership.equals("All")) {
-                                            if (ownerData == null || !ownerData.equals(ownership)) {
-                                                passesFilters = false;
-                                            }
-                                        }
+                                            // If the camera is within the radius, plot the marker
+                                            if (distanceToCamera <= radiusInKm) {
+                                                LatLng cameraLocation = new LatLng(latitude, longitude);
 
-                                        // 3. Check the backup days filter (if backupDays is provided)
-                                        if (backupDays != null) {
-                                            if (documentBackupDays == null || !documentBackupDays.equals(backupDays)) {
-                                                passesFilters = false;
-                                            }
-                                        }
+                                                // Add yellow marker to the map
+                                                Marker marker = mMap.addMarker(new MarkerOptions()
+                                                        .position(cameraLocation)
+                                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                                                        .title("CCTV Location"));
 
-                                        // If the camera passes all active filters, prepare to plot it
-                                        if (passesFilters) {
-                                            LatLng cameraLocation = new LatLng(latitude, longitude);
-                                            markersToPlot.add(new MarkerOptions()
-                                                    .position(cameraLocation)
-                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                                                    .title("CCTV Location"));
+                                                // Add marker to the list
+                                                cameraMarkers.add(marker);
+
+                                                Log.d(TAG, "Camera within radius, plotting marker at: Lat: " + latitude + ", Lng: " + longitude);
+                                            } else {
+                                                Log.d(TAG, "Camera outside radius, skipping");
+                                            }
+
+                                            // Reset latitude and longitude for the next iteration
+                                            latitude = null;
+                                            longitude = null;
                                         }
                                     }
                                 }
 
-                                // Plot all the filtered markers
-                                for (MarkerOptions markerOptions : markersToPlot) {
-                                    cameraMarkers.add(mMap.addMarker(markerOptions));
+                                // Set all markers visible initially
+                                for (Marker marker : cameraMarkers) {
+                                    marker.setVisible(true);
                                 }
 
-                                // Update camera visibility state
-                                areCamerasVisible = !cameraMarkers.isEmpty();
-                                showCamerasButton.setText(areCamerasVisible ? "Hide Cameras" : "Show Cameras");
+                                areCamerasVisible = true;
+                                showCamerasButton.setText("Hide Cameras");
 
                             } else {
                                 Log.e(TAG, "Error fetching data", task.getException());
@@ -562,70 +636,4 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-
-
-
-    // Fetch and log camera data (latitude and longitude)
-    private void fetchFirestoreData() {
-        db.collection("cctvdatanew")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Initialize a list to store the LatLng coordinates
-                        List<DocumentSnapshot> documentList = new ArrayList<>(task.getResult().getDocuments());
-
-                        for (DocumentSnapshot document : documentList) {
-                            // Convert the entire document data into a string
-                            String documentData = document.getData().toString();
-
-                            // Split the string by commas
-                            String[] dataArray = documentData.split(",");
-
-                            // Temporary variables for latitude and longitude
-                            Double latitude = null;
-                            Double longitude = null;
-
-                            // Process each element in the array
-                            for (String dataPiece : dataArray) {
-                                dataPiece = dataPiece.trim();
-
-                                // Check if the data piece contains Latitude or Longitude
-                                if (dataPiece.contains("Latitude")) {
-                                    latitude = Double.parseDouble(dataPiece.split("=")[1].trim());
-                                } else if (dataPiece.contains("Longitude")) {
-                                    longitude = Double.parseDouble(dataPiece.split("=")[1].trim());
-                                }
-
-                                // If both latitude and longitude are available, add the marker
-                                if (latitude != null && longitude != null) {
-                                    LatLng location = new LatLng(latitude, longitude);
-
-                                    // Add yellow marker to the map and store in the list
-                                    Marker marker = mMap.addMarker(new MarkerOptions()
-                                            .position(location)
-                                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                                            .title("CCTV Location"));
-
-                                    cameraMarkers.add(marker);  // Add marker to the list
-
-                                    // Reset latitude and longitude for next iteration
-                                    latitude = null;
-                                    longitude = null;
-                                }
-                            }
-                        }
-
-                        // Set camera markers to visible initially
-                        for (Marker marker : cameraMarkers) {
-                            marker.setVisible(true);
-                        }
-
-                        areCamerasVisible = true;
-                        showCamerasButton.setText("Hide Cameras");
-
-                    } else {
-                        Log.e(TAG, "Error fetching data", task.getException());
-                    }
-                });
-    }
 }

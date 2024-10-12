@@ -1,0 +1,85 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_background"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_marginStart="24dp"
+    android:layout_marginEnd="24dp"
+    android:layout_marginTop="12dp"
+    android:layout_marginBottom="12dp">
+
+<TextView
+android:id="@+id/tv_sno"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="S.No"
+android:textStyle="bold"
+android:textSize="18sp"
+android:layout_marginBottom="8dp"/>
+
+<TextView
+android:id="@+id/tv_location"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Location"
+android:textSize="16sp"
+android:layout_marginBottom="8dp"/>
+
+<TextView
+android:id="@+id/tv_ownership"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Ownership"
+android:textSize="16sp"
+android:layout_marginBottom="8dp"/>
+
+<TextView
+android:id="@+id/tv_owner_name"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Owner Name"
+android:textSize="16sp"
+android:layout_marginBottom="8dp"/>
+
+<TextView
+android:id="@+id/tv_contact_no"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Contact No"
+android:textSize="16sp"
+android:layout_marginBottom="8dp"/>
+
+<TextView
+android:id="@+id/tv_work_status"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Work Status"
+android:textSize="16sp"
+android:layout_marginBottom="8dp"/>
+
+<TextView
+android:id="@+id/tv_coverage"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Coverage"
+android:textSize="16sp"
+android:layout_marginBottom="8dp"/>
+
+<TextView
+android:id="@+id/tv_backup_days"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Backup Days"
+android:textSize="16sp"
+android:layout_marginBottom="8dp"/>
+
+<TextView
+android:id="@+id/tv_connected_to_network"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Connected to Network"
+android:textSize="16sp"
+android:layout_marginBottom="8dp"/>
+    </LinearLayout>

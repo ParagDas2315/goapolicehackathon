@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete CCTV Data"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Input field for Sno to delete -->
+        <EditText
+            android:id="@+id/input_sno_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Serial No to Delete"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/rounded_edit_text"
+            android:inputType="number"
+            android:elevation="4dp" />
+
+        <!-- Delete button -->
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete Entry"
+            android:background="@drawable/rounded_button"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:padding="16dp"
+            android:elevation="6dp"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+</ScrollView>

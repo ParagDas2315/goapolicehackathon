@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#FFFFFF">
+
+    <!-- CCTV Camera Icon on Top -->
+    <ImageView
+        android:id="@+id/cctv_icon"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_cctv_camera"
+        android:contentDescription="CCTV Camera Icon"
+        android:layout_gravity="center"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Manage CCTV Data Button -->
+    <Button
+        android:id="@+id/manage_cctv_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Manage CCTV Data"
+        android:padding="16dp"
+        android:textSize="18sp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="#FFFFFF" />
+
+    <!-- Manage User Data Button -->
+    <Button
+        android:id="@+id/manage_user_data_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Manage User Data"
+        android:padding="16dp"
+        android:textSize="18sp"
+        android:background="@drawable/rounded_button"
+        android:textColor="#FFFFFF" />
+
+    <!-- Humanoid Icon on Bottom -->
+    <ImageView
+        android:id="@+id/humanoid_icon"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_humanoid"
+        android:contentDescription="Humanoid Icon"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp" />
+
+</LinearLayout>

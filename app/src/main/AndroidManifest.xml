@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions to access internet and location for Google Maps -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CCTVui">
+
+        <!-- Google Maps API key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCUmGgLNBjljdjjDauRNIXjgxPTagg0BKs"/> <!-- Replace with your actual API key -->
+
+        <!-- Splash Activity (New Launcher Activity) -->
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Login Activity (Main Login Page) -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true" /> <!-- No longer the launcher, opens after splash -->
+
+        <!-- Admin Dashboard Activity -->
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="false" /> <!-- Not exported since it's only accessed post-login -->
+
+        <!-- Main mapsui Activity -->
+        <activity
+            android:name=".mapsui"
+            android:exported="false" /> <!-- Not exported since no intent-filter -->
+
+        <!-- Filter Activity -->
+        <activity
+            android:name=".filter_activity"
+            android:exported="false" /> <!-- Not exported since no intent-filter -->
+
+        <!-- Settings Activity -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <!-- Help Activity -->
+        <activity
+            android:name=".HelpActivity"
+            android:exported="false" />
+
+        <!-- Upload Activity -->
+        <activity
+            android:name=".UploadActivity"
+            android:exported="false" />
+
+        <!-- Account Activity -->
+        <activity
+            android:name=".AccountActivity"
+            android:exported="false" />
+
+        <!-- Manage CCTV Activity -->
+        <activity
+            android:name=".ManageCCTVActivity"
+            android:exported="false" /> <!-- CCTV management, not exported -->
+
+        <!-- Manage User Data Activity -->
+        <activity
+            android:name=".ManageUserDataActivity"
+            android:exported="false" /> <!-- User data management, not exported -->
+
+        <!-- Insert/Delete Activities -->
+        <activity android:name=".InsertCCTVActivity" android:exported="false" />
+        <activity android:name=".DeleteCCTVActivity" android:exported="false" />
+        <activity android:name=".InsertUserActivity" android:exported="false" />
+        <activity android:name=".DeleteUserActivity" android:exported="false" />
+
+    </application>
+</manifest>

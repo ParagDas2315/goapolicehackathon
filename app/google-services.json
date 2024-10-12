@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "326073516462",
+    "project_id": "goapolicehackathon-6d7c1",
+    "storage_bucket": "goapolicehackathon-6d7c1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:326073516462:android:684acd9d9230aadca9083f",
+        "android_client_info": {
+          "package_name": "com.example.cctvui"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABARYcP8s7OrwYQz_UrZSIZUJjtFob3io"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

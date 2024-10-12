@@ -1,0 +1,181 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="16dp">
+
+    <!-- LinearLayout to align Back Arrow and Title horizontally -->
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="10dp"> <!-- Reduced margin to move the title up -->
+
+        <!-- Back Arrow Button -->
+        <ImageView
+            android:id="@+id/back_arrow"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_back_arrow"
+            android:contentDescription="Back Arrow"
+            android:onClick="onBackArrowClick"
+            android:layout_marginEnd="16dp"/>
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/filter_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter Options"
+            android:textSize="26sp"
+        android:textColor="#2C3E50"
+        android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Distance Filter -->
+    <LinearLayout
+        android:id="@+id/distance_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header_layout"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="20dp"> <!-- Adjusted margin for a cleaner look -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distance (Kilometers)"
+            android:textSize="18sp"
+            android:textColor="#2C3E50" />
+
+        <EditText
+            android:id="@+id/distance_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter distance in kilometers"
+            android:inputType="number"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <!-- Backup Duration Filter -->
+    <LinearLayout
+        android:id="@+id/backup_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/distance_filter"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Backup Duration (Days)"
+            android:textSize="18sp"
+            android:textColor="#2C3E50" />
+
+        <EditText
+            android:id="@+id/backup_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter number of days"
+            android:inputType="number"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <!-- Ownership Filter -->
+    <LinearLayout
+        android:id="@+id/ownership_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/backup_filter"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ownership"
+            android:textSize="18sp"
+            android:textColor="#2C3E50" />
+
+        <CheckBox
+            android:id="@+id/all_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All"
+            android:checked="true"/>
+
+        <CheckBox
+            android:id="@+id/public_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Public"/>
+
+        <CheckBox
+            android:id="@+id/private_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Private"/>
+
+        <CheckBox
+            android:id="@+id/schools_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Schools"/>
+
+        <CheckBox
+            android:id="@+id/religious_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Religious"/>
+
+        <CheckBox
+            android:id="@+id/residents_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Residents"/>
+
+        <CheckBox
+            android:id="@+id/banks_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Banks"/>
+    </LinearLayout>
+
+    <!-- Buttons at the bottom -->
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/clear_button"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Clear"
+            android:background="@drawable/rounded_button"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/apply_button"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Apply"
+            android:background="@drawable/rounded_button"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+</RelativeLayout>

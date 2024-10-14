@@ -71,7 +71,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/progress_card"
         android:layout_width="300dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_gravity="center"
         android:visibility="gone"
         app:cardElevation="8dp"

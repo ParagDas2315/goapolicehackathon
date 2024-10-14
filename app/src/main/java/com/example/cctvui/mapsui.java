@@ -4,12 +4,18 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -68,6 +74,9 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
     private static final double RADIUS_IN_KM = 100;  // Fixed radius of 100 km
     private ImageView saveKmlButton;
     private CardView progressCard;
+    private Geocoder geocoder;
+    private Marker lastSearchMarker;
+
 
 
 
@@ -83,6 +92,10 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         saveKmlButton = findViewById(R.id.upload_icon);
         progressCard = findViewById(R.id.progress_card);
         LinearLayout account = findViewById(R.id.account_button);
+        geocoder = new Geocoder(this, Locale.getDefault());
+        EditText placeSearchInput = findViewById(R.id.place_search_input);
+        ImageView searchIcon = findViewById(R.id.search_icon);
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -102,6 +115,25 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             Intent intent = new Intent(mapsui.this, filter_activity.class);
             startActivityForResult(intent, 1);  // 1 is the request code for filter
         });
+        placeSearchInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event != null &&
+                    event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+
+                // Perform the search when the Enter key or search button is pressed
+                String placeName = placeSearchInput.getText().toString().trim();
+                searchForPlace(placeName);
+
+                // Optionally hide the soft keyboard after search
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(placeSearchInput.getWindowToken(), 0);
+                }
+
+                return true;  // Return true to indicate the event is handled
+            }
+            return false;
+        });
+
 
         // Show/Hide Cameras button logic
         showCamerasButton.setOnClickListener(v -> {
@@ -121,6 +153,45 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             startActivity(intent);
         });
     }
+
+    private void searchForPlace(String placeName) {
+        if (placeName == null || placeName.isEmpty()) {
+            Toast.makeText(this, "Please enter a place name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Trim the input string to remove unnecessary spaces
+        placeName = placeName.trim();
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            // Fetch addresses based on the place name
+            List<Address> addresses = geocoder.getFromLocationName(placeName, 1);
+
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                // Move camera to the searched location
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
+                // Remove the previous marker if it exists
+                if (lastSearchMarker != null) {
+                    lastSearchMarker.remove();
+                }
+
+                // Add a new marker at the searched location and save its reference
+                lastSearchMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(placeName));
+            } else {
+                Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error searching location: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
 
     private void hideCameras() {
         if (mMap != null) {

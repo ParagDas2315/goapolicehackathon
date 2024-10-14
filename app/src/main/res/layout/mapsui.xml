@@ -33,9 +33,9 @@
             android:src="@drawable/ic_search"
             android:contentDescription="Search Icon" />
 
-        <!-- Search Bar EditText (Non-editable, acts as a trigger for Autocomplete) -->
+        <!-- Search Bar EditText (Where users can type the place name) -->
         <EditText
-            android:id="@+id/searchBar"
+            android:id="@+id/place_search_input"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -45,9 +45,9 @@
             android:textColorHint="#2C3E50"
             android:gravity="center_vertical"
             android:textSize="16sp"
-            android:focusable="false"
-            android:cursorVisible="false"
-            android:inputType="none" />
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:singleLine="true" />
 
         <!-- Filter Icon -->
         <ImageView

@@ -3,32 +3,39 @@ package com.example.cctvui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import android.view.View;
-import android.widget.ProgressBar;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameInput, passwordInput;
     private Button loginButton, adminLoginButton;
+    private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private ProgressBar progressBar;
+    private TextView otpLoginLink; // Added for OTP login link
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize Firestore
+        // Initialize Firebase Auth and Firestore
+        mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         // Initialize UI elements
@@ -36,21 +43,36 @@ public class LoginActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.password_input);
         loginButton = findViewById(R.id.login_button);
         adminLoginButton = findViewById(R.id.admin_login_button);
+        progressBar = findViewById(R.id.progressBar);
+        otpLoginLink = findViewById(R.id.otp_login_link); // OTP Login Link
+
+        // Check if user is already logged in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            // User is already logged in, navigate to main activity
+            navigateToMain();
+        }
 
         // Set click listener for regular login button
         loginButton.setOnClickListener(v -> loginUser(false));
 
         // Set click listener for admin login button
         adminLoginButton.setOnClickListener(v -> loginUser(true));
-        progressBar = findViewById(R.id.progressBar);
+
+        // Set click listener for OTP login link
+        otpLoginLink.setOnClickListener(v -> {
+            // Open OtpLoginActivity
+            Intent intent = new Intent(LoginActivity.this, OtpLoginActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void loginUser(boolean isAdmin) {
-        String username = usernameInput.getText().toString().trim();
+        String email = usernameInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
-        if (TextUtils.isEmpty(username)) {
-            Toast.makeText(LoginActivity.this, "Please enter username", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(LoginActivity.this, "Please enter email", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -58,69 +80,86 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(LoginActivity.this, "Please enter password", Toast.LENGTH_SHORT).show();
             return;
         }
+
         findViewById(R.id.progress_card).setVisibility(View.VISIBLE);
 
-        // If the login is not for admin, hash the password before comparison
-        if (!isAdmin) {
-            password = hashPassword(password);
-            if (password == null) {
-                Toast.makeText(LoginActivity.this, "Error hashing password", Toast.LENGTH_SHORT).show();
-                findViewById(R.id.progress_card).setVisibility(View.GONE);
-                return;
-            }
+        if (isAdmin) {
+            // Admin login via Firestore with encrypted password
+            checkAdminLogin(email, password);
+        } else {
+            // Regular user login via Firebase Authentication
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        findViewById(R.id.progress_card).setVisibility(View.GONE);
+                        if (task.isSuccessful()) {
+                            // Login successful
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                            navigateToMain();
+                        } else {
+                            // If login fails
+                            Toast.makeText(LoginActivity.this, "Authentication Failed: " + task.getException().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+    private void checkAdminLogin(String username, String password) {
+        // Hash the password using SHA-256
+        String hashedPassword = hashPassword(password);
+        if (hashedPassword == null) {
+            Toast.makeText(LoginActivity.this, "Error hashing password", Toast.LENGTH_SHORT).show();
+            findViewById(R.id.progress_card).setVisibility(View.GONE);
+            return;
         }
 
-        // Query Firestore to check if the user exists and the password matches
-        CollectionReference usersRef = isAdmin ? db.collection("admin") : db.collection("users");
-        String finalPassword = password;
-        usersRef.whereEqualTo("username", username)
+        // Log the username and hashed password for debugging
+        Log.d("AdminLogin", "Username: " + username + ", Hashed Password: " + hashedPassword);
+
+        // Query Firestore to check if admin exists and the hashed password matches
+        CollectionReference adminRef = db.collection("admin");
+        adminRef.whereEqualTo("username", username)  // Query using 'username' field instead of 'email'
                 .get()
                 .addOnCompleteListener(task -> {
                     findViewById(R.id.progress_card).setVisibility(View.GONE);
-                    if (task.isSuccessful()) {
-                        if (!task.getResult().isEmpty()) {
-                            boolean isValid = false;
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String storedPassword = document.getString("password");
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        boolean isValid = false;
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String storedPassword = document.getString("password");
 
-                                // Make sure storedPassword is not null to avoid crashes
-                                if (storedPassword != null && finalPassword.equals(storedPassword)) {
-                                    isValid = true;
+                            // Log the stored password for comparison
+                            Log.d("AdminLogin", "Stored Password: " + storedPassword);
 
-                                    // Display login success message
-                                    Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-
-                                    // If login is successful, navigate to the appropriate activity
-                                    Intent intent;
-                                    if (isAdmin) {
-                                        intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
-                                    } else {
-                                        intent = new Intent(LoginActivity.this, mapsui.class);
-                                    }
-
-                                    startActivity(intent);
-                                    finish();
-                                    break;
-                                }
+                            // Compare the hashed input password with the stored hashed password
+                            if (storedPassword != null && storedPassword.equals(hashedPassword)) {
+                                isValid = true;
+                                Toast.makeText(LoginActivity.this, "Admin Login Successful", Toast.LENGTH_SHORT).show();
+                                navigateToAdminDashboard();
+                                break;
                             }
-
-                            if (!isValid) {
-                                Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            // No user found with the provided username
+                        }
+                        if (!isValid) {
                             Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        // Handle Firestore error
-                        Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
+    private void navigateToMain() {
+        Intent intent = new Intent(LoginActivity.this, mapsui.class);
+        startActivity(intent);
+        finish();
+    }
 
-    // Function to hash the password using SHA-256 (used for regular users only)
+    private void navigateToAdminDashboard() {
+        Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -132,7 +171,6 @@ public class LoginActivity extends AppCompatActivity {
         return null;
     }
 
-    // Helper function to convert byte array to a hexadecimal string
     private String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : hash) {

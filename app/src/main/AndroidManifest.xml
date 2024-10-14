@@ -34,6 +34,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".OtpLoginActivity" />
+
         <!-- Login Activity (Main Login Page) -->
         <activity
             android:name=".LoginActivity"

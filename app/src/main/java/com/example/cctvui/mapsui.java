@@ -1,6 +1,7 @@
 package com.example.cctvui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +70,8 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
     private CardView progressCard;
 
 
+
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +82,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         ImageView filterButton = findViewById(R.id.filter_icon);
         saveKmlButton = findViewById(R.id.upload_icon);
         progressCard = findViewById(R.id.progress_card);
+        LinearLayout account = findViewById(R.id.account_button);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -110,6 +115,11 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             areCamerasShown = !areCamerasShown; // Toggle the state
         });
         saveKmlButton.setOnClickListener(v -> saveDataToKML());
+
+        account.setOnClickListener(v -> {
+            Intent intent = new Intent(mapsui.this, AccountActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void hideCameras() {

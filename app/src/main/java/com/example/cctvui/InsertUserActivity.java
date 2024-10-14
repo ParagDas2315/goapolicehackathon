@@ -6,10 +6,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,14 +19,16 @@ public class InsertUserActivity extends AppCompatActivity {
     private EditText usernameInput, passwordInput;
     private Button submitButton;
     private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert_user);
 
-        // Initialize Firestore
+        // Initialize Firestore and Firebase Auth
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         // Initialize input fields and button
         usernameInput = findViewById(R.id.username_input);
@@ -42,63 +45,55 @@ public class InsertUserActivity extends AppCompatActivity {
                 return;
             }
 
-            // Hash the password before storing it
-            String encryptedPassword = hashPassword(password);
-
-            if (encryptedPassword != null) {
-                // Call the function to insert data into Firestore
-                insertUserData(username, encryptedPassword);
-            } else {
-                Toast.makeText(InsertUserActivity.this, "Error encrypting password", Toast.LENGTH_SHORT).show();
-            }
+            // Call the function to create the user using Firebase Authentication
+            createUser(username, password);
         });
     }
 
+    // Function to create a user using Firebase Authentication
+    private void createUser(String email, String password) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // User created successfully
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            // Add any additional user data in Firestore
+                            insertUserData(user.getEmail(), user.getUid());
+                        }
+                    } else {
+                        // Handle errors like user already exists
+                        if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                            Toast.makeText(InsertUserActivity.this, "User already exists", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(InsertUserActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
     // Function to insert user data into Firestore
-    private void insertUserData(String username, String password) {
+    private void insertUserData(String email, String uid) {
         // Create a new user data object
         Map<String, Object> userData = new HashMap<>();
-        userData.put("username", username);
-        userData.put("password", password); // Insert encrypted password
+        userData.put("email", email);  // Save email
+        userData.put("uid", uid);      // Save Firebase Authentication UID (Unique ID)
 
-        // Insert data into Firestore
-        db.collection("users").add(userData).addOnSuccessListener(documentReference -> {
-            Toast.makeText(InsertUserActivity.this, "User Data inserted", Toast.LENGTH_SHORT).show();
-            clearInputFields();
-            finish(); // Close the activity after successful insertion
-        }).addOnFailureListener(e -> {
-            Toast.makeText(InsertUserActivity.this, "Error inserting data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
+        // Insert data into Firestore (optional)
+        db.collection("users").document(uid).set(userData)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(InsertUserActivity.this, "User data inserted", Toast.LENGTH_SHORT).show();
+                    clearInputFields();
+                    finish(); // Close the activity after successful insertion
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(InsertUserActivity.this, "Error inserting data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     // Helper function to clear input fields after inserting data
     private void clearInputFields() {
         usernameInput.setText("");
         passwordInput.setText("");
-    }
-
-    // Function to hash the password using SHA-256
-    private String hashPassword(String password) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(password.getBytes());
-            return bytesToHex(encodedHash);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // Helper function to convert byte array to a hexadecimal string
-    private String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
     }
 }

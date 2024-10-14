@@ -2,9 +2,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
-    <!-- Main content layout for the login page -->
+    <!-- Main content layout for the OTP sending page -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,98 +24,54 @@
             android:src="@drawable/emblem_of_goa_police"
             android:contentDescription="Goa Police Logo" />
 
-        <!-- Title for the App -->
+        <!-- Title for the Send OTP page -->
         <TextView
-            android:id="@+id/app_title"
+            android:id="@+id/send_otp_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CCTV Tracking App"
+            android:text="Enter Your Phone Number"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="32dp"
             android:textColor="#000000" />
 
-        <!-- Username Input -->
+        <!-- Phone Number Input Field -->
         <EditText
-            android:id="@+id/username_input"
+            android:id="@+id/phone_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username"
+            android:hint="Enter Phone Number"
             android:padding="16dp"
             android:drawablePadding="8dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/rounded_edit_text"
-            android:inputType="text"
+            android:inputType="phone"
+            android:maxLength="10"
             android:textSize="16sp"
             android:elevation="4dp"
             android:textColor="#000000"
-            android:textColorHint="#888888"
-            android:drawableStart="@drawable/ic_user" />
+            android:textColorHint="#888888" />
 
-        <!-- Password Input -->
-        <EditText
-            android:id="@+id/password_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:padding="16dp"
-            android:drawablePadding="8dp"
-            android:layout_marginBottom="32dp"
-            android:background="@drawable/rounded_edit_text"
-            android:inputType="textPassword"
-            android:textSize="16sp"
-            android:elevation="4dp"
-            android:textColor="#000000"
-            android:textColorHint="#888888"
-            android:drawableStart="@drawable/ic_password" />
-
-        <!-- Login Button -->
+        <!-- Send OTP Button -->
         <Button
-            android:id="@+id/login_button"
+            android:id="@+id/send_otp_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login"
+            android:text="Send OTP"
             android:background="@drawable/rounded_button"
             android:textColor="#FFFFFF"
             android:padding="16dp"
             android:textSize="18sp"
             android:elevation="8dp"
             android:layout_marginBottom="16dp" />
-
-        <!-- Admin Login Button -->
-        <Button
-            android:id="@+id/admin_login_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Admin Login"
-            android:background="@drawable/rounded_button"
-            android:textColor="#FFFFFF"
-            android:padding="16dp"
-            android:textSize="18sp"
-            android:elevation="8dp"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Login using OTP Link -->
-        <TextView
-            android:id="@+id/otp_login_link"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Login using OTP"
-            android:textSize="16sp"
-            android:textColor="#0000FF"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:clickable="true"
-            android:focusable="true" />
-
     </LinearLayout>
 
     <!-- Progress Bar in a CardView (initially hidden) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/progress_card"
         android:layout_width="300dp"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="gone"
         app:cardElevation="8dp"
@@ -138,10 +95,9 @@
                 android:id="@+id/loading_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Loading..."
+                android:text="Sending..."
                 android:textSize="16sp"
                 android:textColor="#333333" />
-
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

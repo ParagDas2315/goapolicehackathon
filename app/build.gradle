@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore' // Firestore for admin user records
     implementation 'com.sendgrid:sendgrid-java:4.7.2'       // SendGrid for sending emails
 
+
     // Optional: Add Firebase Database if you need it
     // implementation 'com.google.firebase:firebase-database'
 

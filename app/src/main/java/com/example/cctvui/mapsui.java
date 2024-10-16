@@ -60,6 +60,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
+import android.app.ProgressDialog;
 
 
 public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
@@ -75,9 +76,12 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
     private static final int REQUEST_LOCATION_PERMISSION = 113;
     private static final double RADIUS_IN_KM = 100;  // Fixed radius of 100 km
     private ImageView saveKmlButton;
-    private CardView progressCard;
+    private ImageView terminal;
+    private ProgressDialog progressDialog;
     private Geocoder geocoder;
     private Marker lastSearchMarker;
+
+    private ArrayList<String> latLngListForTerminal = new ArrayList<>();
 
 
 
@@ -92,11 +96,14 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         Button showCamerasButton = findViewById(R.id.show_cameras_button);
         ImageView filterButton = findViewById(R.id.filter_icon);
         saveKmlButton = findViewById(R.id.upload_icon);
-        progressCard = findViewById(R.id.progress_card);
+        terminal = findViewById(R.id.help_icon);
         LinearLayout account = findViewById(R.id.account_button);
         geocoder = new Geocoder(this, Locale.getDefault());
         EditText placeSearchInput = findViewById(R.id.place_search_input);
         ImageView searchIcon = findViewById(R.id.search_icon);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Fetching Locations...");
+        progressDialog.setCancelable(false);
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -136,6 +143,12 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             return false;
         });
 
+        terminal.setOnClickListener(v -> {
+            Intent intent = new Intent(mapsui.this, HelpActivity.class);
+            intent.putStringArrayListExtra("LAT_LNG_LIST", latLngListForTerminal);
+            startActivity(intent);
+        });
+
 
         // Show/Hide Cameras button logic
         showCamerasButton.setOnClickListener(v -> {
@@ -154,6 +167,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             Intent intent = new Intent(mapsui.this, AccountActivity.class);
             startActivity(intent);
         });
+
     }
 
     private void searchForPlace(String placeName) {
@@ -195,6 +209,8 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
 
 
 
+
+
     private void hideCameras() {
         if (mMap != null) {
             // Clear all markers from the map
@@ -202,19 +218,6 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    // Show loading bar
-    private void showLoading() {
-        if (progressCard != null) {
-            progressCard.setVisibility(View.VISIBLE);
-        }
-    }
-
-    // Hide loading bar
-    private void hideLoading() {
-        if (progressCard != null) {
-            progressCard.setVisibility(View.GONE);
-        }
-    }
 
     private void startLocationUpdates() {
         LocationRequest locationRequest = LocationRequest.create();
@@ -318,7 +321,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                 if (location != null) {
-                    showLoading();
+                    progressDialog.show();
                     double userLat = location.getLatitude();
                     double userLng = location.getLongitude();
 
@@ -333,11 +336,12 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
 
                     // Execute the query
                     query.get().addOnCompleteListener(task -> {
-                        hideLoading();
+                        progressDialog.dismiss();
                         if (task.isSuccessful()) {
                             List<DocumentSnapshot> documentList = task.getResult().getDocuments();
                             mMap.clear(); // Clear the map
                             cameraMarkers.clear(); // Clear existing markers
+                            latLngListForTerminal.clear(); // Clear the previous data
 
                             if (documentList.isEmpty()) {
                                 Toast.makeText(this, "No cameras found with the specified filters.", Toast.LENGTH_SHORT).show();
@@ -346,10 +350,22 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
 
                             for (DocumentSnapshot document : documentList) {
                                 try {
-                                    // Fetch latitude and longitude as numbers
-                                    Double latitude = document.getDouble("Latitude");
-                                    Double longitude = document.getDouble("Longitude");
+                                    // Fetch Latitude and Longitude as numbers
+                                    Double latitude = null;
+                                    Double longitude = null;
 
+                                    Object latObj = document.get("Latitude");
+                                    Object lngObj = document.get("Longitude");
+
+                                    if (latObj instanceof Double) {
+                                        latitude = (Double) latObj;
+                                    }
+
+                                    if (lngObj instanceof Double) {
+                                        longitude = (Double) lngObj;
+                                    }
+
+                                    // Ensure both latitude and longitude are not null
                                     if (latitude != null && longitude != null) {
                                         if (radius != null) {
                                             // If radius is provided, filter based on distance
@@ -360,6 +376,10 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                                                         .position(cameraLocation)
                                                         .title("CCTV Location"));
                                                 cameraMarkers.add(marker);
+
+                                                // Add to latLngListForTerminal
+                                                String cameraDetails = String.format("Lat: %f, Lng: %f", latitude, longitude);
+                                                latLngListForTerminal.add(cameraDetails);
                                             }
                                         } else {
                                             // If no radius is provided, add all cameras that match the filters
@@ -368,6 +388,10 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                                                     .position(cameraLocation)
                                                     .title("CCTV Location"));
                                             cameraMarkers.add(marker);
+
+                                            // Add to latLngListForTerminal
+                                            String cameraDetails = String.format("Lat: %f, Lng: %f", latitude, longitude);
+                                            latLngListForTerminal.add(cameraDetails);
                                         }
                                     } else {
                                         Log.e(TAG, "Latitude/Longitude is null for document: " + document.getId());
@@ -388,13 +412,14 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                     Toast.makeText(this, "Unable to get current location.", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(e -> {
-                hideLoading();
+                progressDialog.dismiss();
                 Toast.makeText(this, "Error accessing location: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             });
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         }
     }
+
 
 
 
@@ -533,78 +558,78 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                 if (location != null) {
-                    showLoading();
+                    progressDialog.show();
                     double userLat = location.getLatitude();
                     double userLng = location.getLongitude();
 
                     // Fetch all camera locations from Firestore
-                    db.collection("cctvdatanew")
-                            .get()
-                            .addOnCompleteListener(task -> {
-                                hideLoading();
-                                if (task.isSuccessful()) {
-                                    List<DocumentSnapshot> documentList = task.getResult().getDocuments();
-                                    mMap.clear();  // Clear any previous markers
-                                    cameraMarkers.clear();
+                    db.collection("cctvdatanew").get().addOnCompleteListener(task -> {
+                        progressDialog.dismiss();
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> documentList = task.getResult().getDocuments();
+                            mMap.clear();  // Clear any previous markers
+                            cameraMarkers.clear();
+                            latLngListForTerminal.clear(); // Clear the previous data
 
-                                    if (documentList.isEmpty()) {
-                                        Log.d(TAG, "No cameras found.");
-                                        Toast.makeText(this, "No cameras found.", Toast.LENGTH_SHORT).show();
-                                        return;
+                            if (documentList.isEmpty()) {
+                                Log.d(TAG, "No cameras found.");
+                                Toast.makeText(this, "No cameras found.", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            for (DocumentSnapshot document : documentList) {
+                                try {
+                                    // Fetch Latitude and Longitude as numbers
+                                    Double latitude = null;
+                                    Double longitude = null;
+
+                                    Object latObj = document.get("Latitude");
+                                    Object lngObj = document.get("Longitude");
+
+                                    if (latObj instanceof Double) {
+                                        latitude = (Double) latObj;
                                     }
 
-                                    for (DocumentSnapshot document : documentList) {
-                                        try {
-                                            // Fetch Latitude and Longitude
-                                            Object latObj = document.get("Latitude");
-                                            Object lngObj = document.get("Longitude");
+                                    if (lngObj instanceof Double) {
+                                        longitude = (Double) lngObj;
+                                    }
 
-                                            Double latitude = null;
-                                            Double longitude = null;
+                                    // Ensure both latitude and longitude are not null
+                                    if (latitude != null && longitude != null) {
+                                        double distanceToCamera = calculateDistance(userLat, userLng, latitude, longitude);
 
-                                            if (latObj instanceof Double) {
-                                                latitude = (Double) latObj;
-                                            } else if (latObj instanceof String) {
-                                                latitude = Double.parseDouble((String) latObj);
-                                            }
+                                        if (distanceToCamera <= RADIUS_IN_KM) {
+                                            LatLng cameraLocation = new LatLng(latitude, longitude);
+                                            Marker marker = mMap.addMarker(new MarkerOptions()
+                                                    .position(cameraLocation)
+                                                    .title("CCTV Location"));
 
-                                            if (lngObj instanceof Double) {
-                                                longitude = (Double) lngObj;
-                                            } else if (lngObj instanceof String) {
-                                                longitude = Double.parseDouble((String) lngObj);
-                                            }
+                                            cameraMarkers.add(marker);
 
-                                            if (latitude != null && longitude != null) {
-                                                double distanceToCamera = calculateDistance(userLat, userLng, latitude, longitude);
-
-                                                if (distanceToCamera <= RADIUS_IN_KM) {
-                                                    LatLng cameraLocation = new LatLng(latitude, longitude);
-                                                    Marker marker = mMap.addMarker(new MarkerOptions()
-                                                            .position(cameraLocation)
-                                                            .title("CCTV Location"));
-
-                                                    cameraMarkers.add(marker);
-                                                }
-                                            } else {
-                                                Log.e(TAG, "Latitude/Longitude is null or missing for document: " + document.getId());
-                                            }
-                                        } catch (Exception e) {
-                                            Log.e(TAG, "Error processing document: " + document.getId(), e);
+                                            // Add to latLngListForTerminal
+                                            String cameraDetails = String.format("Lat: %f, Lng: %f", latitude, longitude);
+                                            latLngListForTerminal.add(cameraDetails);
                                         }
+                                    } else {
+                                        Log.e(TAG, "Latitude/Longitude is null for document: " + document.getId());
                                     }
-
-                                    if (cameraMarkers.isEmpty()) {
-                                        Toast.makeText(this, "No cameras found within the specified radius.", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Log.e(TAG, "Error fetching data", task.getException());
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Error processing document: " + document.getId(), e);
                                 }
-                            });
+                            }
+
+                            if (cameraMarkers.isEmpty()) {
+                                Toast.makeText(this, "No cameras found within the specified radius.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.e(TAG, "Error fetching data", task.getException());
+                        }
+                    });
                 } else {
                     Toast.makeText(this, "Unable to get current location.", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(e -> {
-                hideLoading();
+                progressDialog.dismiss();
                 Toast.makeText(this, "Error accessing location: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             });
         } else {
@@ -670,17 +695,17 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         tvConnectedToNetwork.setTextColor(Color.BLACK);
 
         // Set the fetched data into views
-        tvSno.setText("S.No: " + sno);
-        tvLocation.setText("Location: " + location);
-        tvOwnership.setText("Ownership: " + ownership);
-        tvOwnerName.setText("Owner Name: " + ownerName);
+        tvSno.setText(sno.toString());
+        tvLocation.setText(location);
+        tvOwnership.setText(ownership);
+        tvOwnerName.setText(ownerName);
 
         // Handle ContactNo of different types (String, Long, etc.)
         if (contactNo != null) {
             if (contactNo instanceof Long) {
-                tvContactNo.setText("Contact No: " + ((Long) contactNo).toString());
+                tvContactNo.setText(((Long) contactNo).toString());
             } else if (contactNo instanceof String) {
-                tvContactNo.setText("Contact No: " + (String) contactNo);
+                tvContactNo.setText((String) contactNo);
             } else {
                 tvContactNo.setText("Contact No: Unknown format");
             }
@@ -688,10 +713,10 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             tvContactNo.setText("Contact No: Not available");
         }
 
-        tvWorkStatus.setText("Work Status: " + workStatus);
-        tvCoverage.setText("Coverage: " + coverage);
-        tvBackupDays.setText("Backup Days: " + backupDays);
-        tvConnectedToNetwork.setText("Connected to Network: " + connectedToNetwork);
+        tvWorkStatus.setText(workStatus);
+        tvCoverage.setText(coverage);
+        tvBackupDays.setText(backupDays.toString());
+        tvConnectedToNetwork.setText(connectedToNetwork);
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();

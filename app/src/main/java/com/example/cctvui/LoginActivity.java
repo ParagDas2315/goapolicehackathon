@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import android.app.ProgressDialog;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -28,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private ProgressBar progressBar;
     private TextView otpLoginLink; // Added for OTP login link
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +45,10 @@ public class LoginActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.password_input);
         loginButton = findViewById(R.id.login_button);
         adminLoginButton = findViewById(R.id.admin_login_button);
-        progressBar = findViewById(R.id.progressBar);
         otpLoginLink = findViewById(R.id.otp_login_link); // OTP Login Link
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Logging in...");
+        progressDialog.setCancelable(false);
 
         // Check if user is already logged in
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -81,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        findViewById(R.id.progress_card).setVisibility(View.VISIBLE);
+        progressDialog.show();
 
         if (isAdmin) {
             // Admin login via Firestore with encrypted password
@@ -90,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
             // Regular user login via Firebase Authentication
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
-                        findViewById(R.id.progress_card).setVisibility(View.GONE);
+                        progressDialog.dismiss();
                         if (task.isSuccessful()) {
                             // Login successful
                             FirebaseUser user = mAuth.getCurrentUser();
@@ -110,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
         String hashedPassword = hashPassword(password);
         if (hashedPassword == null) {
             Toast.makeText(LoginActivity.this, "Error hashing password", Toast.LENGTH_SHORT).show();
-            findViewById(R.id.progress_card).setVisibility(View.GONE);
+            progressDialog.dismiss();
             return;
         }
 
@@ -122,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
         adminRef.whereEqualTo("username", username)  // Query using 'username' field instead of 'email'
                 .get()
                 .addOnCompleteListener(task -> {
-                    findViewById(R.id.progress_card).setVisibility(View.GONE);
+                    progressDialog.dismiss();
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         boolean isValid = false;
                         for (QueryDocumentSnapshot document : task.getResult()) {

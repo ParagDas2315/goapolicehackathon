@@ -89,13 +89,15 @@
     <Button
         android:id="@+id/show_cameras_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Show Cameras"
+        android:layout_height="38dp"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="100dp"
+        android:background="@drawable/rounded_button"
+        android:text="Show Cameras"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
-        android:background="@drawable/rounded_button" />
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"/>
 
     <!-- Bottom Menu Section (Overlaid on top of the map) -->
     <LinearLayout

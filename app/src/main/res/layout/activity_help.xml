@@ -41,11 +41,18 @@
             android:layout_gravity="center_horizontal"/>
     </LinearLayout>
 
-    <!-- Block Container for Card Views -->
-    <LinearLayout
-        android:id="@+id/block_container"
+    <!-- ScrollView to make the block container scrollable -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Block Container for Card Views -->
+        <LinearLayout
+            android:id="@+id/block_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
 
 </LinearLayout>

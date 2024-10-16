@@ -26,7 +26,7 @@ public class HelpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
-
+        findViewById(R.id.back_arrow).setOnClickListener(v -> onBackPressed());
         db = FirebaseFirestore.getInstance();  // Initialize Firestore
         LinearLayout blockContainer = findViewById(R.id.block_container);
 

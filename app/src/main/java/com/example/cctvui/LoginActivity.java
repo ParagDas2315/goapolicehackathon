@@ -186,4 +186,5 @@ public class LoginActivity extends AppCompatActivity {
         }
         return hexString.toString();
     }
+
 }

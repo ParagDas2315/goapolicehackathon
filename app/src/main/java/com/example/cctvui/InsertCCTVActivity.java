@@ -104,7 +104,7 @@ public class InsertCCTVActivity extends AppCompatActivity {
             cctvData.put("Workstatus", workStatus);
 
             // Insert data into Firestore
-            db.collection("cctvdatatesting").add(cctvData).addOnSuccessListener(documentReference -> {
+            db.collection("cctvdatanew").add(cctvData).addOnSuccessListener(documentReference -> {
                 Toast.makeText(InsertCCTVActivity.this, "CCTV Data inserted", Toast.LENGTH_SHORT).show();
                 clearInputFields();
                 finish(); // Close the activity after successful insertion

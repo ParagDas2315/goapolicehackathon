@@ -44,7 +44,7 @@ public class DeleteCCTVActivity extends AppCompatActivity {
     // Function to delete data based on Sno
     private void deleteCCTVDataBySno(String sno) {
         // Reference to the CCTV data collection
-        CollectionReference cctvDataRef = db.collection("cctvdatatesting");
+        CollectionReference cctvDataRef = db.collection("cctvdatanew");
 
         // Query Firestore for the document with the specified Sno
         cctvDataRef.whereEqualTo("Sno", Integer.parseInt(sno))

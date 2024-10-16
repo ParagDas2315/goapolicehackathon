@@ -22,6 +22,42 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp" />
 
+        <!-- Input field for name -->
+        <EditText
+            android:id="@+id/name_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Name"
+            android:padding="16dp"
+            android:background="@drawable/rounded_edit_text"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Dropdown for designation -->
+        <Spinner
+            android:id="@+id/designation_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edit_text" />
+
+        <!-- Dropdown for district -->
+        <Spinner
+            android:id="@+id/district_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edit_text" />
+
+        <!-- Input field for outpost location -->
+        <EditText
+            android:id="@+id/outpost_location_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Outpost Location"
+            android:padding="16dp"
+            android:background="@drawable/rounded_edit_text"
+            android:layout_marginBottom="16dp" />
+
         <!-- Input field for username -->
         <EditText
             android:id="@+id/username_input"

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -421,7 +423,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);  // Enable location tracking
             mMap.getUiSettings().setZoomControlsEnabled(true);
-            mMap.getUiSettings().setCompassEnabled(true);
+            mMap.getUiSettings().setCompassEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(false); // Disable default location button
             mMap.setPadding(0,0,0,250);
 
@@ -649,14 +651,23 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
 
         // Find views inside the bottom sheet and set the data
         TextView tvSno = bottomSheetView.findViewById(R.id.tv_sno);
+        tvSno.setTextColor(Color.BLACK);
         TextView tvLocation = bottomSheetView.findViewById(R.id.tv_location);
+        tvLocation.setTextColor(Color.BLACK);
         TextView tvOwnership = bottomSheetView.findViewById(R.id.tv_ownership);
+        tvOwnership.setTextColor(Color.BLACK);
         TextView tvOwnerName = bottomSheetView.findViewById(R.id.tv_owner_name);
+        tvOwnerName.setTextColor(Color.BLACK);
         TextView tvContactNo = bottomSheetView.findViewById(R.id.tv_contact_no);
+        tvContactNo.setTextColor(Color.BLACK);
         TextView tvWorkStatus = bottomSheetView.findViewById(R.id.tv_work_status);
+        tvWorkStatus.setTextColor(Color.BLACK);
         TextView tvCoverage = bottomSheetView.findViewById(R.id.tv_coverage);
+        tvCoverage.setTextColor(Color.BLACK);
         TextView tvBackupDays = bottomSheetView.findViewById(R.id.tv_backup_days);
+        tvBackupDays.setTextColor(Color.BLACK);
         TextView tvConnectedToNetwork = bottomSheetView.findViewById(R.id.tv_connected_to_network);
+        tvConnectedToNetwork.setTextColor(Color.BLACK);
 
         // Set the fetched data into views
         tvSno.setText("S.No: " + sno);

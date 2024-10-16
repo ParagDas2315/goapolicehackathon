@@ -1,4 +1,28 @@
 <resources>
     <string name="app_name">CCTV Locator</string>
     <string name="terminal">Terminal</string>
+
+    <!-- Designation options -->
+    <string-array name="designation_options">
+        <item>Select Designation</item>
+        <item>Director General of Police (DGP)</item>
+        <item>Additional Director General of Police (ADGP)</item>
+        <item>Inspector General of Police (IGP)</item>
+        <item>Deputy Inspector General of Police (DIG)</item>
+        <item>Superintendent of Police (SP) / Senior Superintendent of Police (SSP)</item>
+        <item>Additional Superintendent of Police (ASP)</item>
+        <item>Deputy Superintendent of Police (DySP) / Assistant Commissioner of Police (ACP)</item>
+        <item>Inspector of Police</item>
+        <item>Sub-Inspector of Police (SI)</item>
+        <item>Assistant Sub-Inspector of Police (ASI)</item>
+        <item>Head Constable</item>
+        <item>Constable</item>
+    </string-array>
+
+    <!-- District options -->
+    <string-array name="district_options">
+        <item>Select District</item>
+        <item>North Goa</item>
+        <item>South Goa</item>
+    </string-array>
 </resources>

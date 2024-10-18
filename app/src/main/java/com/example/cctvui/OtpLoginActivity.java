@@ -1,9 +1,9 @@
 package com.example.cctvui;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -28,8 +28,8 @@ public class OtpLoginActivity extends AppCompatActivity {
     private String verificationId;
 
     // Progress bar
-    private View progressCard;
-    private View otpVerificationProgressCard;  // For OTP verification progress
+    private ProgressDialog progressDialog;
+    private ProgressDialog otpVerificationProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +41,17 @@ public class OtpLoginActivity extends AppCompatActivity {
         // Initialize phone input and send OTP button
         phoneInput = findViewById(R.id.phone_input);
         sendOtpButton = findViewById(R.id.send_otp_button);
-        progressCard = findViewById(R.id.progress_card);  // Find the progress card
 
+        // Initialize ProgressDialogs
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Sending OTP...");
+        progressDialog.setCancelable(false);
+
+        otpVerificationProgressDialog = new ProgressDialog(this);
+        otpVerificationProgressDialog.setMessage("Verifying OTP...");
+        otpVerificationProgressDialog.setCancelable(false);
+
+        // Set the Send OTP button click listener
         sendOtpButton.setOnClickListener(v -> {
             String phoneNumber = phoneInput.getText().toString().trim();
 
@@ -58,27 +67,13 @@ public class OtpLoginActivity extends AppCompatActivity {
             }
 
             // Show progress bar while checking the phone number
-            showLoading();
+            if (!isFinishing()) {
+                progressDialog.show();
+            }
 
             // Check if the phone number exists in Firestore before sending OTP
             checkPhoneNumberInDatabase(phoneNumber);
         });
-    }
-
-    private void showLoading() {
-        progressCard.setVisibility(View.VISIBLE);  // Show the progress bar for sending OTP
-    }
-
-    private void hideLoading() {
-        progressCard.setVisibility(View.GONE);  // Hide the progress bar for sending OTP
-    }
-
-    private void showOtpVerificationLoading() {
-        otpVerificationProgressCard.setVisibility(View.VISIBLE);  // Show the progress bar for verifying OTP
-    }
-
-    private void hideOtpVerificationLoading() {
-        otpVerificationProgressCard.setVisibility(View.GONE);  // Hide the progress bar for verifying OTP
     }
 
     private void checkPhoneNumberInDatabase(String phoneNumber) {
@@ -89,7 +84,9 @@ public class OtpLoginActivity extends AppCompatActivity {
                 .whereEqualTo("phone", phoneNumber)  // Make sure phone numbers are stored in a 'phone' field
                 .get()
                 .addOnCompleteListener(task -> {
-                    hideLoading();  // Hide progress bar when the database operation is complete
+                    if (!isFinishing()) {
+                        progressDialog.dismiss(); // Hide progress bar when the database operation is complete
+                    }
 
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         // Phone number found, proceed with sending OTP
@@ -100,14 +97,18 @@ public class OtpLoginActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    hideLoading();
+                    if (!isFinishing()) {
+                        progressDialog.dismiss();
+                    }
                     Toast.makeText(OtpLoginActivity.this, "Error checking phone number: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
     private void sendOtp(String phoneNumber) {
         // Show progress while sending OTP
-        showLoading();
+        if (!isFinishing()) {
+            progressDialog.show();
+        }
 
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
                 .setPhoneNumber(phoneNumber)       // Phone number to verify
@@ -122,22 +123,27 @@ public class OtpLoginActivity extends AppCompatActivity {
             new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                 @Override
                 public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
-                    hideLoading();  // Hide progress when verification is completed
+                    if (!isFinishing()) {
+                        progressDialog.dismiss(); // Hide progress when verification is completed
+                    }
                     signInWithPhoneAuthCredential(credential);
                 }
 
                 @Override
                 public void onVerificationFailed(@NonNull FirebaseException e) {
-                    hideLoading();  // Hide progress when verification fails
+                    if (!isFinishing()) {
+                        progressDialog.dismiss(); // Hide progress when verification fails
+                    }
                     Toast.makeText(OtpLoginActivity.this, "Verification failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onCodeSent(@NonNull String verificationId,
                                        @NonNull PhoneAuthProvider.ForceResendingToken token) {
-                    hideLoading();  // Hide progress after OTP is sent
+                    if (!isFinishing()) {
+                        progressDialog.dismiss();  // Hide progress after OTP is sent
+                    }
                     OtpLoginActivity.this.verificationId = verificationId;
-                    // After OTP is sent, navigate to the OTP verification card
                     showOtpCard();
                     Toast.makeText(OtpLoginActivity.this, "OTP sent", Toast.LENGTH_SHORT).show();
                 }
@@ -148,7 +154,6 @@ public class OtpLoginActivity extends AppCompatActivity {
 
         otpInput = findViewById(R.id.otp_input);
         verifyOtpButton = findViewById(R.id.verify_otp_button);
-        otpVerificationProgressCard = findViewById(R.id.otp_verification_progress);  // Find the OTP verification progress card
 
         verifyOtpButton.setOnClickListener(v -> {
             String code = otpInput.getText().toString().trim();
@@ -156,7 +161,9 @@ public class OtpLoginActivity extends AppCompatActivity {
                 Toast.makeText(OtpLoginActivity.this, "Please enter the OTP", Toast.LENGTH_SHORT).show();
                 return;
             }
-            showOtpVerificationLoading();  // Show progress when verifying OTP
+            if (!isFinishing()) {
+                otpVerificationProgressDialog.show(); // Show progress when verifying OTP
+            }
             verifyOtp(code);
         });
 
@@ -179,7 +186,9 @@ public class OtpLoginActivity extends AppCompatActivity {
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
-                    hideOtpVerificationLoading();  // Hide progress after verification is done
+                    if (!isFinishing()) {
+                        otpVerificationProgressDialog.dismiss(); // Hide progress after verification is done
+                    }
                     if (task.isSuccessful()) {
                         // OTP verified successfully
                         Toast.makeText(OtpLoginActivity.this, "OTP Verified", Toast.LENGTH_SHORT).show();
@@ -197,4 +206,3 @@ public class OtpLoginActivity extends AppCompatActivity {
         finish();
     }
 }
-

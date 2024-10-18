@@ -9,6 +9,8 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:colorControlHighlight">#33000000</item> <!-- Semi-transparent dark shade -->
+
 
     </style>
 </resources>

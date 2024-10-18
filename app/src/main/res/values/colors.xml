@@ -10,5 +10,7 @@
     <color name="colorPrimary">#FF5722</color> <!-- Example primary color -->
     <color name="colorPrimaryDark">#00000000</color> <!-- Fully transparent -->
     <color name="colorAccent">#FF03DAC5</color> <!-- Accent color -->
+    <color name="button_pressed_color">#DDE3E3E3</color> <!-- Slight dark shade, adjust as needed -->
+
 </resources>
 

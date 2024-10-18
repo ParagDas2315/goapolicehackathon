@@ -1,5 +1,6 @@
 package com.example.cctvui;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
@@ -20,7 +21,8 @@ import java.util.Set;
 public class HelpActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
-    private Set<String> uniqueDetailsSet = new HashSet<>();// Use a Set to avoid duplicates
+    private Set<String> uniqueDetailsSet = new HashSet<>(); // Use a Set to avoid duplicates
+    private ProgressDialog progressDialog; // Progress dialog
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +32,17 @@ public class HelpActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();  // Initialize Firestore
         LinearLayout blockContainer = findViewById(R.id.block_container);
 
+        // Initialize the progress dialog
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Fetching data...");
+        progressDialog.setCancelable(false);
+
         // Get the list of lat-long pairs from the intent
         ArrayList<String> latLngList = getIntent().getStringArrayListExtra("LAT_LNG_LIST");
 
         // Check if data is received
         if (latLngList != null && !latLngList.isEmpty()) {
+            progressDialog.show(); // Show progress dialog
             for (String latLng : latLngList) {
                 // Modify parsing logic to handle "Lat: <latitude>, Lng: <longitude>" format
                 try {
@@ -79,36 +87,44 @@ public class HelpActivity extends AppCompatActivity {
                             Long backupDays = document.getLong("Backupdays");
                             String connectedToNetwork = document.getString("Connectedtonetwork");
 
-                            // Prepare details to match your working format
-                            String details = sno + "," + location + "," + ownership + "," + ownerName + "," +
-                                    (contactNo != null ? contactNo.toString() : "N/A") + "," +
-                                    workStatus + "," + coverage + "," +
-                                    (backupDays != null ? backupDays.toString() : "N/A") + "," +
-                                    connectedToNetwork;
+                            // Prepare details array to maintain order
+                            String[] detailsArray = {
+                                    sno != null ? sno.toString() : "NA",
+                                    location != null ? location : "NA",
+                                    ownership != null ? ownership : "NA",
+                                    ownerName != null ? ownerName : "NA",
+                                    contactNo != null ? contactNo.toString() : "NA",
+                                    workStatus != null ? workStatus : "NA",
+                                    coverage != null ? coverage : "NA",
+                                    backupDays != null ? backupDays.toString() : "NA",
+                                    connectedToNetwork != null ? connectedToNetwork : "NA"
+                            };
 
-                            // Add only if it's not already in the Set (to remove duplicates)
-                            if (uniqueDetailsSet.add(details)) {
-                                addDetailBlock(details, blockContainer);
+                            // Create a unique key to ensure no duplicates
+                            String uniqueKey = String.join(",", detailsArray);
+
+                            if (uniqueDetailsSet.add(uniqueKey)) {
+                                addDetailBlock(detailsArray, blockContainer);
                             }
-
                         } else {
                             Log.e("HelpActivity", "No data found for location: " + latitude + ", " + longitude);
-                            Toast.makeText(this, "No data found for location: " + latitude + ", " + longitude, Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Log.e("HelpActivity", "Task failed. Error: ", task.getException());
                         Toast.makeText(this, "Error fetching data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+
+                    // Dismiss progress dialog when task is complete
+                    progressDialog.dismiss();
                 })
                 .addOnFailureListener(e -> {
                     Log.e("HelpActivity", "Failure fetching data: " + e.getMessage());
                     Toast.makeText(this, "Error fetching data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss(); // Dismiss on failure
                 });
     }
 
-    private void addDetailBlock(String details, LinearLayout blockContainer) {
-        String[] detailsArray = details.split(","); // Assuming each entry has comma-separated values in the order
-
+    private void addDetailBlock(String[] detailsArray, LinearLayout blockContainer) {
         // Create a new card for each entry
         CardView cardView = new CardView(this);
         cardView.setLayoutParams(new ViewGroup.LayoutParams(
@@ -124,8 +140,7 @@ public class HelpActivity extends AppCompatActivity {
         LinearLayout detailsLayout = new LinearLayout(this);
         detailsLayout.setOrientation(LinearLayout.VERTICAL);
 
-        // Assuming details are in the following order:
-        // Sno, Location, Ownership, OwnerName, ContactNo, WorkStatus, Coverage, BackupDays, ConnectedToNetwork
+        // Labels corresponding to details
         String[] labels = {"Sno", "Location", "Ownership", "Owner Name", "Contact No", "Work Status", "Coverage", "Backup Days", "Connected to Network"};
 
         for (int i = 0; i < detailsArray.length && i < labels.length; i++) {

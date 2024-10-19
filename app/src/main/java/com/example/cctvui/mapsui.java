@@ -38,7 +38,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -197,8 +199,22 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                     lastSearchMarker.remove();
                 }
 
-                // Add a new marker at the searched location and save its reference
-                lastSearchMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(placeName));
+                // Add a new marker at the searched location with a blue color
+                lastSearchMarker = mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title(placeName)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));  // Set marker color to blue
+
+                // Draw a circle around the searched location (5 km radius)
+                mMap.addCircle(new CircleOptions()
+                        .center(latLng)
+                        .radius(2000)  // Radius in meters (5 km)
+                        .strokeColor(Color.BLUE)  // Circle border color
+                        .fillColor(0x220000FF)  // Light blue fill color with transparency
+                        .strokeWidth(2f));  // Width of the circle border
+
+                // Fetch nearby cameras within 5 km from the searched location
+                fetchNearbyCameras(latLng.latitude, latLng.longitude, 2.0);
             } else {
                 Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show();
             }
@@ -206,6 +222,78 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             Toast.makeText(this, "Error searching location: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+
+
+    private void fetchNearbyCameras(double searchLat, double searchLng, double radiusInKm) {
+        progressDialog.show();
+
+        // Fetch all camera locations from Firestore
+        db.collection("cctvdatanew").get().addOnCompleteListener(task -> {
+            progressDialog.dismiss();
+            if (task.isSuccessful()) {
+                List<DocumentSnapshot> documentList = task.getResult().getDocuments();
+                cameraMarkers.clear();
+                latLngListForTerminal.clear(); // Clear the previous data
+
+                if (documentList.isEmpty()) {
+                    Log.d(TAG, "No cameras found.");
+                    Toast.makeText(this, "No cameras found.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                for (DocumentSnapshot document : documentList) {
+                    try {
+                        // Fetch Latitude and Longitude as numbers
+                        Double latitude = null;
+                        Double longitude = null;
+
+                        Object latObj = document.get("Latitude");
+                        Object lngObj = document.get("Longitude");
+
+                        if (latObj instanceof Double) {
+                            latitude = (Double) latObj;
+                        }
+
+                        if (lngObj instanceof Double) {
+                            longitude = (Double) lngObj;
+                        }
+
+                        // Ensure both latitude and longitude are not null
+                        if (latitude != null && longitude != null) {
+                            double distanceToCamera = calculateDistance(searchLat, searchLng, latitude, longitude);
+
+                            if (distanceToCamera <= radiusInKm) {  // Only add cameras within the specified km
+                                LatLng cameraLocation = new LatLng(latitude, longitude);
+                                Marker marker = mMap.addMarker(new MarkerOptions()
+                                        .position(cameraLocation)
+                                        .title("CCTV Location"));
+
+                                cameraMarkers.add(marker);
+
+                                // Add to latLngListForTerminal
+                                String cameraDetails = String.format("Lat: %f, Lng: %f", latitude, longitude);
+                                latLngListForTerminal.add(cameraDetails);
+                            }
+                        } else {
+                            Log.e(TAG, "Latitude/Longitude is null for document: " + document.getId());
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error processing document: " + document.getId(), e);
+                    }
+                }
+
+                if (cameraMarkers.isEmpty()) {
+                    Toast.makeText(this, "No cameras found within 5 km.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Log.e(TAG, "Error fetching data", task.getException());
+            }
+        });
+    }
+
+
+
 
 
 

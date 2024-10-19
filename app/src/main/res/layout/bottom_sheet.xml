@@ -16,14 +16,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tv_sno1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="S.No: "
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
             android:id="@+id/tv_sno"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,14 +37,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tv_location1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Location: "
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
 
         <TextView
             android:id="@+id/tv_location"
@@ -78,14 +62,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tv_ownership1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ownership: "
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
             android:id="@+id/tv_ownership"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -107,14 +83,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tv_owner_name1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Owner Name: "
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
 
         <TextView
             android:id="@+id/tv_owner_name"
@@ -140,14 +108,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tv_contact_no1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Contact No: "
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
             android:id="@+id/tv_contact_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -169,14 +129,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tv_work_status1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Work Status: "
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
 
         <TextView
             android:id="@+id/tv_work_status"
@@ -202,14 +154,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tv_coverage1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Coverage: "
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
             android:id="@+id/tv_coverage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -231,14 +175,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tv_backup_days1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Backup Days: "
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
 
         <TextView
             android:id="@+id/tv_backup_days"
@@ -264,14 +200,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tv_connected_to_network1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Connected to Network: "
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
             android:id="@+id/tv_connected_to_network"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -287,5 +215,16 @@
             android:textSize="16sp"
             android:layout_marginStart="8dp" />
     </LinearLayout>
+
+    <!-- Get Directions Button -->
+    <Button
+        android:id="@+id/btn_directions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Directions"
+        android:background="@color/black"
+        android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
+        android:padding="12dp" />
 
 </LinearLayout>

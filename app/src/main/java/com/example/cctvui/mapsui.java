@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -598,7 +599,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                                     if (latitude != null && longitude != null) {
                                         double distanceToCamera = calculateDistance(userLat, userLng, latitude, longitude);
 
-                                        if (distanceToCamera <= RADIUS_IN_KM) {
+                                        if (distanceToCamera <= 5) {  // Only add cameras within 10 km
                                             LatLng cameraLocation = new LatLng(latitude, longitude);
                                             Marker marker = mMap.addMarker(new MarkerOptions()
                                                     .position(cameraLocation)
@@ -619,7 +620,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                             }
 
                             if (cameraMarkers.isEmpty()) {
-                                Toast.makeText(this, "No cameras found within the specified radius.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "No cameras found within 10 km.", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Log.e(TAG, "Error fetching data", task.getException());
@@ -636,6 +637,7 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         }
     }
+
 
 
     private void fetchCameraDetailsFromFirestore(double latitude, double longitude) {
@@ -658,9 +660,11 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                         String coverage = document.getString("Coverage");
                         Long backupDays = document.getLong("Backupdays");
                         String connectedToNetwork = document.getString("Connectedtonetwork");
+                        double latitude1 = document.getDouble("Latitude");  // Assuming 'Latitude' is stored as Double in Firestore
+                        double longitude1 = document.getDouble("Longitude");  // Assuming 'Longitude' is stored as Double in Firestore
 
-                        // Show the details in a BottomSheetDialog
-                        showBottomSheet(sno, location, ownership, ownerName, contactNo, workStatus, coverage, backupDays, connectedToNetwork);
+                        showBottomSheet(sno, location, ownership, ownerName, contactNo, workStatus, coverage, backupDays, connectedToNetwork, latitude1, longitude1);
+
                     } else {
                         Toast.makeText(mapsui.this, "No data found for this location.", Toast.LENGTH_SHORT).show();
                     }
@@ -670,35 +674,27 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
                 });
     }
 
-    private void showBottomSheet(Long sno, String location, String ownership, String ownerName, Object contactNo, String workStatus, String coverage, Long backupDays, String connectedToNetwork) {
+    private void showBottomSheet(Long sno, String location, String ownership, String ownerName, Object contactNo, String workStatus, String coverage, Long backupDays, String connectedToNetwork, double latitude, double longitude) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet, null);
 
         // Find views inside the bottom sheet and set the data
-        TextView tvSno = bottomSheetView.findViewById(R.id.tv_sno);
-        tvSno.setTextColor(Color.BLACK);
-        TextView tvLocation = bottomSheetView.findViewById(R.id.tv_location);
-        tvLocation.setTextColor(Color.BLACK);
-        TextView tvOwnership = bottomSheetView.findViewById(R.id.tv_ownership);
-        tvOwnership.setTextColor(Color.BLACK);
-        TextView tvOwnerName = bottomSheetView.findViewById(R.id.tv_owner_name);
-        tvOwnerName.setTextColor(Color.BLACK);
-        TextView tvContactNo = bottomSheetView.findViewById(R.id.tv_contact_no);
-        tvContactNo.setTextColor(Color.BLACK);
-        TextView tvWorkStatus = bottomSheetView.findViewById(R.id.tv_work_status);
-        tvWorkStatus.setTextColor(Color.BLACK);
-        TextView tvCoverage = bottomSheetView.findViewById(R.id.tv_coverage);
-        tvCoverage.setTextColor(Color.BLACK);
-        TextView tvBackupDays = bottomSheetView.findViewById(R.id.tv_backup_days);
-        tvBackupDays.setTextColor(Color.BLACK);
-        TextView tvConnectedToNetwork = bottomSheetView.findViewById(R.id.tv_connected_to_network);
-        tvConnectedToNetwork.setTextColor(Color.BLACK);
+        TextView tvSno = bottomSheetView.findViewById(R.id.value_sno);
+        TextView tvLocation = bottomSheetView.findViewById(R.id.value_location);
+        TextView tvOwnership = bottomSheetView.findViewById(R.id.value_ownership);
+        TextView tvOwnerName = bottomSheetView.findViewById(R.id.value_owner_name);
+        TextView tvContactNo = bottomSheetView.findViewById(R.id.value_contact_no);
+        TextView tvWorkStatus = bottomSheetView.findViewById(R.id.value_work_status);
+        TextView tvCoverage = bottomSheetView.findViewById(R.id.value_coverage);
+        TextView tvBackupDays = bottomSheetView.findViewById(R.id.value_backup_days);
+        TextView tvConnectedToNetwork = bottomSheetView.findViewById(R.id.value_connected_to_network);
+        Button btnDirections = bottomSheetView.findViewById(R.id.btn_directions);  // New button
 
         // Set the fetched data into views
-        tvSno.setText(sno.toString());
-        tvLocation.setText(location);
-        tvOwnership.setText(ownership);
-        tvOwnerName.setText(ownerName);
+        tvSno.setText(sno != null ? sno.toString() : "NA");
+        tvLocation.setText(location != null ? location : "NA");
+        tvOwnership.setText(ownership != null ? ownership : "NA");
+        tvOwnerName.setText(ownerName != null ? ownerName : "NA");
 
         // Handle ContactNo of different types (String, Long, etc.)
         if (contactNo != null) {
@@ -707,20 +703,35 @@ public class mapsui extends AppCompatActivity implements OnMapReadyCallback {
             } else if (contactNo instanceof String) {
                 tvContactNo.setText((String) contactNo);
             } else {
-                tvContactNo.setText("Contact No: Unknown format");
+                tvContactNo.setText("NA");
             }
         } else {
-            tvContactNo.setText("Contact No: Not available");
+            tvContactNo.setText("NA");
         }
 
-        tvWorkStatus.setText(workStatus);
-        tvCoverage.setText(coverage);
-        tvBackupDays.setText(backupDays.toString());
-        tvConnectedToNetwork.setText(connectedToNetwork);
+        tvWorkStatus.setText(workStatus != null ? workStatus : "NA");
+        tvCoverage.setText(coverage != null ? coverage : "NA");
+        tvBackupDays.setText(backupDays != null ? backupDays.toString() : "NA");
+        tvConnectedToNetwork.setText(connectedToNetwork != null ? connectedToNetwork : "NA");
+
+        // Directions button functionality
+        btnDirections.setOnClickListener(v -> {
+            String destination = latitude + "," + longitude;  // Use the specific lat/long values
+            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + destination);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+            if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(mapIntent);
+            } else {
+                Toast.makeText(this, "Google Maps is not installed.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
     }
+
+
 
     // Helper method to calculate distance between two coordinates
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
